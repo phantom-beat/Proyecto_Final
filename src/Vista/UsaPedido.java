@@ -17,12 +17,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import static javax.swing.UIManager.get;
 import modelo.ItemProductoCanastaFamiliar;
 import modelo.ItemProductoFarmacia;
 
 public class UsaPedido {
     private static final LinkedList<Pedido> losPedidos = new LinkedList<>();
     private static final String ARCHIVO_PEDIDOS = "pedidos.txt";
+    private static int valorUrgencia;
     
 
 
@@ -106,16 +108,15 @@ private static void crearPedido() {
        String direccionCliente = JOptionPane.showInputDialog("Ingrese la dirección del cliente:");
        String estadoPedido = JOptionPane.showInputDialog("Ingrese el estado del pedido,A: abierto, D: despachado, C: cancelado");
        String observacion = JOptionPane.showInputDialog("ingrese la observacion de el pedido : ");
+       int valorUrgencia = Integer.parseInt(JOptionPane.showInputDialog("ingrese el valor de urgencia de el producto : "));
 
-       
-               
+            
 
-       LocalDateTime fechaHora = null;
         boolean formatoValido = false; // si no hay fecha y hora da error porq el formato no es valido 
-
+        LocalDateTime fechaHora = LocalDateTime.parse(JOptionPane.showInputDialog("Ingrese la fecha y hora (formato: yyyy-MM-dd T HH:mm):"));
         while (!formatoValido) {
             try {
-                LocalDateTime FechaHora = LocalDateTime.parse(JOptionPane.showInputDialog("Ingrese la fecha y hora (formato: yyyy-MM-dd T HH:mm):"));
+
 
                 formatoValido = true;
             } catch (DateTimeParseException e) {
@@ -123,40 +124,44 @@ private static void crearPedido() {
             }
         }
 
+            //cambiamos el estadoPedido de Str a Char 
        char estado = estadoPedido.charAt(0);
 
        if (estado == 'A' || estado == 'D' || estado == 'C') {
            Cliente cliente = new Cliente(idCliente, nombreCliente, direccionCliente);
 
+            //creamos la lista de el producto 
            LinkedList<ItemProducto> productos = new LinkedList<>();
            boolean agregarMas = true;
-
+           
+           //se crea un bucle para el boton agregar mas productos 
+           //pedimos los datos de los productos para crear el objeto en el cual se almacenen los datos 
            while (agregarMas) {
-               String codigoProducto = JOptionPane.showInputDialog("Ingrese el código del producto:");
                String nombreProducto = JOptionPane.showInputDialog("Ingrese el nombre del producto:");
-               String cantidadProductoStr = JOptionPane.showInputDialog("Ingrese la cantidad del producto:");
-               String precioProductoStr = JOptionPane.showInputDialog("Ingrese el precio del producto:");
                String presentacion = JOptionPane.showInputDialog(" ingrese la presentacion del producto");
                String tipo = JOptionPane.showInputDialog(" ingrese el tipo de producto ");
+               double porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog(" ingrese el porcentaje de Iva de el producto : "));
+               
                
                try {
-                   double cantidadProducto = Double.parseDouble(cantidadProductoStr);
-                   double precioProducto = Double.parseDouble(precioProductoStr);
-                   int codigoProductoInt = Integer.parseInt(codigoProducto);
+                   double cantidadProducto = Double.parseDouble(JOptionPane.showInputDialog(" ingrese la cantidad del producto: "));
+                   double precioProducto = Double.parseDouble(JOptionPane.showInputDialog(" ingrese el precio del producto : "));
+                   int codigoProducto = Integer.parseInt(JOptionPane.showInputDialog(" ingrese el codigo del producto  : "));
 
-                   productos.add(new ItemProducto (codigoProductoInt, nombreProducto, cantidadProducto,
-                           presentacion, tipo, precioProducto));
+                   productos.add(new ItemProducto (codigoProducto, nombreProducto, cantidadProducto,
+                           presentacion, tipo,porcentajeIva, precioProducto));
                } catch (NumberFormatException e) {
                    JOptionPane.showMessageDialog(null, "Entrada inválida. Por favor, ingrese valores numéricos válidos.");
                    continue; // Salta a la siguiente iteración del bucle
                }
 
+                //el YES_NO_OPTION es una manera de mostrar un cuadro de dialogo ( con las opciones si y no ) es lo ligamos al bucle para q se repita 
                int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea agregar otro producto?", "Agregar Producto", JOptionPane.YES_NO_OPTION);
                agregarMas = respuesta == JOptionPane.YES_OPTION;
            }
 
-           Pedido pedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observacion, true, estado);
-           losPedidos.add(pedido);
+                Pedido pedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente,valorUrgencia,  productos, observacion, true, estado);
+                losPedidos.add(pedido);
 
            guardarPedidoEnArchivo(pedido);
 
@@ -164,28 +169,39 @@ private static void crearPedido() {
        } else {
            System.out.println("Estado de pedido inválido.");
        }
+        // Si se produce una HeadlessException, se ejecuta este bloque de código
+    // Se muestra un cuadro de diálogo de mensaje al usuario informándole sobre el error
    } catch (HeadlessException e) {
        JOptionPane.showMessageDialog(null, "Error al crear el pedido: " + e.getMessage());
    }
 }
-    private static void guardarPedidoEnArchivo(Pedido pedido) {
+private static void guardarPedidoEnArchivo(Pedido pedido) {
     try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
+        // Intenta abrir el archivo para escritura
+        // Utiliza un bloque try-with-resources para asegurarse de que el recurso se cierre correctamente después
+        // de que se haya terminado de usar
         for (Pedido p : losPedidos) {
+            // Escribe cada pedido y sus detalles en el archivo
             out.println("Pedido #" + p.getNumero());
             out.println("Cliente: " + p.getSuCliente().getNombre() + " - ID: " + p.getSuCliente().getIdentificacion() + " - Dirección: " + p.getSuCliente().getDireccion());
             out.println("Estado: " + p.getEstado());
             out.println("Productos:");
             for (ItemProducto item : p.getSusItemsProductos()) {
+                // Escribe cada producto del pedido
                 out.println("   - " + item.getNombreP() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
             }
             out.println("Observaciones: " + p.getObservacion());
             out.println("--------------------------------------------------");
         }
+         // Limpia el flujo de escritura
         out.flush();
     } catch (IOException e) {
+        // Captura cualquier excepción de E/S (entrada/salida) que pueda ocurrir durante la escritura en el archivo
+        // y muestra un mensaje de error al usuario
         JOptionPane.showMessageDialog(null, "Error al guardar los pedidos en el archivo: " + e.getMessage());
     }
 }
+
 
 private static void actualizarEstadoPedido() {
     try {
@@ -263,34 +279,53 @@ private static void actualizarEstadoPedido() {
 }
 
 
-    private static void consultarTodosPedidos() {
+private static void consultarTodosPedidos() {
     if (losPedidos.isEmpty()) {
         JOptionPane.showMessageDialog(null, "No hay pedidos para mostrar.");
         return;
     }
-    
-    StringBuilder sb = new StringBuilder();
-    for (Pedido p : losPedidos) {
-        sb.append("Pedido #").append(p.getNumero()).append("\n");
-        sb.append("Fecha/Hora: ").append(p.getFechaHora()).append("\n");
-        sb.append("Cliente: ").append(p.getSuCliente().getNombre()).append(" - ID: ").append(p.getSuCliente().getIdentificacion()).append("\n");
-        sb.append("Dirección: ").append(p.getSuCliente().getDireccion()).append("\n");
-        sb.append("Estado: ").append(p.getEstado()).append("\n");
-        sb.append("Productos:\n");
-        for (ItemProducto item : p.getSusItemsProductos()) {
-            sb.append(" - ").append(item.getNombreP()).append(", Código: ").append(item.getCodigo())
-              .append(", Cantidad: ").append(item.getCantidad()).append(", Precio: $").append(item.getPrecio()).append("\n");
-        }
-        sb.append("Observaciones: ").append(p.getObservacion()).append("\n");
-        sb.append("--------------------------------------------------\n\n");
-    }
 
-    JTextArea textArea = new JTextArea(sb.toString());
+    double valorTotalPedidos = 0; // Variable para almacenar el valor total de todos los pedidos
+    double valorTotalPagar = 0; // Variable para almacenar el valor total a pagar
+    String mensaje = ""; // Variable para almacenar el mensaje a mostrar
+
+    for (Pedido p : losPedidos) {
+        mensaje += "Pedido #" + p.getNumero() + "\n";
+        mensaje += "Fecha/Hora: " + p.getFechaHora() + "\n";
+        mensaje += "Cliente: " + p.getSuCliente().getNombre() + " - ID: " + p.getSuCliente().getIdentificacion() + "\n";
+        mensaje += "Dirección: " + p.getSuCliente().getDireccion() + "\n";
+        mensaje += "Estado: " + p.getEstado() + "\n";
+        mensaje += "Productos:\n";
+
+        double valorTotalPedido = p.calcularValorTotalItems(); // Calculamos el valor total del pedido
+
+        for (ItemProducto item : p.getSusItemsProductos()) {
+            mensaje += " - " + item.getNombreP() + ", Código: " + item.getCodigo()
+                    + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio() + "\n";
+        }
+
+        mensaje += "Observaciones: " + p.getObservacion() + "\n";
+        mensaje += "Valor total del pedido: $" + valorTotalPedido + "\n";
+        mensaje += "--------------------------------------------------\n\n";
+
+        valorTotalPedidos += valorTotalPedido;
+    }
+        
+        double valorUrgencia = 0.0;
+        valorTotalPagar = valorTotalPedidos + valorUrgencia;
+
+    // Agregamos el valor total de todos los pedidos al mensaje
+    mensaje += "Valor total de todos los pedidos: $" + valorTotalPedidos + "\n";
+    mensaje += "Valor total a pagar (incluyendo urgencia): $" + valorTotalPagar + "\n";
+
+    JTextArea textArea = new JTextArea(mensaje);
     textArea.setEditable(false);
     JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setPreferredSize(new Dimension(500, 400));
+
     JOptionPane.showMessageDialog(null, scrollPane, "Todos los Pedidos", JOptionPane.INFORMATION_MESSAGE);
 }
+
 
 
 private static void consultarPedidoNumero() {
@@ -388,76 +423,60 @@ private static void consultarPedidoNumero() {
 }
 
 
-private static void consultarUltimoPedido() {
-    // Primero, verificamos si la lista de pedidos está vacía
-    if (losPedidos.isEmpty()) {
-        // Si está vacía, mostramos un mensaje de advertencia y salimos del método
-        JOptionPane.showMessageDialog(null, "No hay pedidos para mostrar.");
-        return;
-    }
-
-    // Si hay pedidos, obtenemos el último pedido de la lista
-    Pedido ultimoPedido = losPedidos.getLast();
-
-    // Creamos un objeto StringBuilder para construir una cadena de texto
-    StringBuilder sb = new StringBuilder();
-
-    // Agregamos la información básica del pedido al StringBuilder
-    sb.append("Último Pedido:\n");
-    sb.append("Pedido #").append(ultimoPedido.getNumero()).append("\n");
-    sb.append("Fecha/Hora: ").append(ultimoPedido.getFechaHora()).append("\n");
-    sb.append("Cliente: ").append(ultimoPedido.getSuCliente().getNombre())
-            .append(" - ID: ").append(ultimoPedido.getSuCliente().getIdentificacion())
-            .append(" - Dirección: ").append(ultimoPedido.getSuCliente().getDireccion()).append("\n");
-    sb.append("Estado: ").append(ultimoPedido.getEstado()).append("\n");
-    sb.append("Observaciones: ").append(ultimoPedido.getObservacion()).append("\n");
-
-    // Agregamos la información de los productos del pedido
-    sb.append("Productos:\n");
-    double valorTotalItems = 0; // Variable para almacenar el valor total de los ítems
-
-    // Iteramos sobre cada ItemProducto del pedido
-    for (ItemProducto item : ultimoPedido.getSusItemsProductos()) {
-        // Agregamos la información básica del ItemProducto al StringBuilder
-        sb.append(" - ").append(item.getNombreP()).append(", Código: ").append(item.getCodigo())
-                .append(", Cantidad: ").append(item.getCantidad()).append(", Precio: $").append(item.getPrecio()).append("\n");
-
-        // Determinamos el dato específico (presentación, tipo o porcentajeIva) del ItemProducto
-        String datoEspecifico = "";
-        if (item instanceof ItemProductoFarmacia) {
-            datoEspecifico = "Presentación: " + ((ItemProductoFarmacia) item).getPresentacion();
-        } else if (item instanceof ItemProductoCanastaFamiliar) {
-            datoEspecifico = "Tipo: " + ((ItemProductoCanastaFamiliar) item).getTipo();
-        } else if (item.getPorcentajeIva() != 0) {
-            datoEspecifico = "Porcentaje IVA: " + item.getPorcentajeIva() + "%";
+  private static void consultarUltimoPedido() {
+        // Primero, verificamos si la lista de pedidos está vacía
+        if (losPedidos.isEmpty()) {
+            // Si está vacía, mostramos un mensaje de advertencia y salimos del método
+            JOptionPane.showMessageDialog(null, "No hay pedidos para mostrar.");
+            return;
         }
 
-        // Si hay un dato específico, lo agregamos al StringBuilder
-        if (!datoEspecifico.isEmpty()) {
-            sb.append("   ").append(datoEspecifico).append("\n");
+        // Si hay pedidos, obtenemos el último pedido de la lista
+        Pedido ultimoPedido = losPedidos.getLast();
+
+        // Creamos un string para almacenar la información del pedido
+        String mensaje = "Último Pedido:\n"
+                + "Pedido #" + ultimoPedido.getNumero() + "\n"
+                + "Fecha/Hora: " + ultimoPedido.getFechaHora() + "\n"
+                + "Cliente: " + ultimoPedido.getSuCliente().getNombre()
+                + " - ID: " + ultimoPedido.getSuCliente().getIdentificacion()
+                + " - Dirección: " + ultimoPedido.getSuCliente().getDireccion() + "\n"
+                + "Estado: " + ultimoPedido.getEstado() + "\n"
+                + "Observaciones: " + ultimoPedido.getObservacion() + "\n"
+                + "Productos:\n";
+
+        double valorTotalItems = 0; // Variable para almacenar el valor total de los ítems
+
+        // Iteramos sobre cada ItemProducto del pedido
+        for (ItemProducto item : ultimoPedido.getSusItemsProductos()) {
+            mensaje += " - " + item.getNombreP() + ", Código: " + item.getCodigo()
+                    + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio() + "\n";
+
+            // Calculamos el valor total del ItemProducto y lo sumamos al valor total de los ítems
+            double valorTotal = item.getCantidad() * item.getPrecio();
+            valorTotalItems += valorTotal;
         }
 
-        // Calculamos el valor total del ItemProducto y lo sumamos al valor total de los ítems
-        double valorTotalItem = item.getCantidad() * item.getPrecio();
-        valorTotalItems += valorTotalItem;
+        // Solicitamos el valor de urgencia y lo sumamos al valor total de los ítems
+        int valorUrgencia = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el valor de urgencia del pedido:"));
+        valorTotalItems += valorUrgencia;
+
+        // Agregamos la cantidad de ítems del pedido y el valor total de los ítems al mensaje
+        mensaje += "Cantidad de ítems de pedido: " + ultimoPedido.getSusItemsProductos().size() + "\n";
+        mensaje += "Valor total de los ítems: $" + valorTotalItems + "\n";
+
+        // Creamos un JTextArea con el texto construido
+        JTextArea textArea = new JTextArea(mensaje);
+        textArea.setEditable(false); // Hacemos que el área de texto no sea editable
+
+        // Creamos un JScrollPane para hacer que el área de texto sea desplazable
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(500, 300)); // Establecemos un tamaño preferido para el JScrollPane
+
+        // Mostramos el JScrollPane en un cuadro de diálogo con un título y un icono de información
+        JOptionPane.showMessageDialog(null, scrollPane, "Consulta del Último Pedido", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Agregamos la cantidad de ítems del pedido y el valor total de los ítems al StringBuilder
-    sb.append("Cantidad de ítems de pedido: ").append(ultimoPedido.getSusItemsProductos().size()).append("\n");
-    sb.append("Valor total de los ítems: $").append(valorTotalItems).append("\n");
-    sb.append("Valor total a pagar: $").append(valorTotalItems); // Suponiendo que no hay descuentos
-
-    // Creamos un JTextArea con el texto construido en el StringBuilder
-    JTextArea textArea = new JTextArea(sb.toString());
-    textArea.setEditable(false); // Hacemos que el área de texto no sea editable
-
-    // Creamos un JScrollPane para hacer que el área de texto sea desplazable
-    JScrollPane scrollPane = new JScrollPane(textArea);
-    scrollPane.setPreferredSize(new Dimension(500, 300)); // Establecemos un tamaño preferido para el JScrollPane
-
-    // Mostramos el JScrollPane en un cuadro de diálogo con un título y un icono de información
-    JOptionPane.showMessageDialog(null, scrollPane, "Consulta del Último Pedido", JOptionPane.INFORMATION_MESSAGE);
-}
 
 
     private static void eliminarTodosPedidos() {
@@ -616,7 +635,7 @@ private static void recuperarPedidosDesdeArchivoTexto() {
 
                 // Crear un nuevo pedido
                 int numeroPedido = Integer.parseInt(line.split("#")[1].trim());
-                pedido = new Pedido(numeroPedido, null, null, null, null, false, ' '); // Nuevo pedido
+                pedido = new Pedido(numeroPedido, null, null, valorUrgencia, null, null, false, ' '); // Nuevo pedido
                 productos = new LinkedList<>(); // Resetear la lista de productos
             } else if (line.startsWith("Fecha/Hora:")) { // Información de fecha y hora
                 LocalDateTime fechaHora = LocalDateTime.parse(line.split(":")[1].trim(), formatter);
@@ -660,7 +679,6 @@ private static void recuperarPedidosDesdeArchivoTexto() {
     }
 }
 }
-
 
 
 
