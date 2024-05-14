@@ -1,19 +1,17 @@
-package modelo;
-
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 
-
 public class Pedido {
-    int numero;
-    LocalDateTime fechaHora;
-    Cliente suCliente;
-    LinkedList<ItemProducto> susItemsProductos;
-    String observacion;
-    boolean normal;
-    char estado;
+    private int numero;
+    private LocalDateTime fechaHora;
+    private Cliente suCliente;
+    private LinkedList<ItemProducto> susItemsProductos;
+    private String observacion;
+    private boolean normal;
+    private char estado;
 
-    public Pedido(int numero, LocalDateTime fechaHora, Cliente suCliente, LinkedList<ItemProducto> susItemsProductos, String observacion, boolean normal, char estado) {
+    public Pedido(int numero, LocalDateTime fechaHora, Cliente suCliente, LinkedList<ItemProducto> susItemsProductos,
+                  String observacion, boolean normal, char estado) {
         this.numero = numero;
         this.fechaHora = fechaHora;
         this.suCliente = suCliente;
@@ -79,39 +77,32 @@ public class Pedido {
         this.estado = estado;
     }
 
+    // Calcula el total de los ítems en el pedido
+    public double calcularValorTotalItems() {
+        double total = 0;
+        for (ItemProducto item : susItemsProductos) {
+            total += item.calcularValorTotal();
+        }
+        return total;
+    }
+
+    // Calcula el valor total a pagar, incluyendo un valor adicional en caso de urgencia
+    public double calcularValorTotalPagar(int valorUrgencia) {
+        double totalItems = calcularValorTotalItems();
+        return totalItems + valorUrgencia;
+    }
+
     @Override
     public String toString() {
-        return "Pedido{" + "numero=" + numero + ", fechaHora=" + fechaHora + ", suCliente=" + suCliente + ", susItemsProductos=" + susItemsProductos + ", observacion=" + observacion + ", normal=" + normal + ", estado=" + estado + '}';
+        return "Pedido{" +
+               "numero=" + numero +
+               ", fechaHora=" + fechaHora +
+               ", suCliente=" + suCliente +
+               ", susItemsProductos=" + susItemsProductos +
+               ", observacion='" + observacion + '\'' +
+               ", normal=" + normal +
+               ", estado=" + estado +
+               '}';
     }
-public int calcularCantidadItemsPedido() {
-        return susItemsProductos.size(); // Devuelve el número de ítems
-    }
-
-public double calcularValorTotalItems() {
-    double valorTotal = 0.0;
-
-    // Iterar sobre cada ItemProducto en susItemsProductos
-    for (ItemProducto item : susItemsProductos) {
-        int cantidad = (int) item.getCantidad();
-        double precio = item.getPrecio();
-        double porcentajeIva = item.getPorcentajeIva();
-        String categoria = item.getCategoria();
-
-        double valorItem = ItemProducto.calcularValorTotal();
-
-        // Sumar el valor total del ItemProducto al valorTotal
-        valorTotal += valorItem;
-    }
-
-    return valorTotal;
 }
 
-public double calcularValorTotalPagar() {
-    return calcularValorTotalItems();
-}
-
-// Método para calcular el valor total a pagar, sumando un valor por urgencia
-public double calcularValorTotalPagar(double valorUrgencia) {
-    return calcularValorTotalItems() + valorUrgencia; // Suma el valor de los ítems y el valor por urgencia
-}
-}
