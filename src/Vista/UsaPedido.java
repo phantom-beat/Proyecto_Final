@@ -87,9 +87,6 @@ public class UsaPedido {
             String estadoPedido = JOptionPane.showInputDialog("Ingrese el estado del pedido (A: abierto, D: despachado, C: cancelado):");
             String observaciones = JOptionPane.showInputDialog("Ingrese las observaciones del pedido:");
 
-            
-
-
             LocalDateTime fechaHora = null;
             boolean formatoValido = false;
             while (!formatoValido) {
@@ -113,8 +110,6 @@ public class UsaPedido {
                 double cantidadProducto = Double.parseDouble(JOptionPane.showInputDialog("Ingrese la cantidad del producto:"));
                 double precioProducto = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
                 String tipoProducto = JOptionPane.showInputDialog("Ingrese el tipo de producto (Farmacia/Canasta/Otro):");
-
-                
 
                 ItemProducto producto = null;
                 switch (tipoProducto.toLowerCase()) {
@@ -157,9 +152,6 @@ public class UsaPedido {
                     JOptionPane.showMessageDialog(null, "El valor total del pedido urgente es: " + valorTotal);
                 }
 
-
-
-            
             guardarPedidoEnArchivo();
             JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito.");
         } catch (NumberFormatException e) {
@@ -180,12 +172,12 @@ public class UsaPedido {
                 out.println("Productos:");
                 for (ItemProducto item : p.getSusItemsProductos()) {
                     out.println("   - " + item.getClass().getSimpleName() + " - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
-                    if (item instanceof ItemProductoFarmacia itemProductoFarmacia) {
-                        out.println("       Presentación: " + itemProductoFarmacia.getPresentacion());
-                    } else if (item instanceof ItemProductoCanastaFamiliar itemProductoCanastaFamiliar) {
-                        out.println("       Tipo: " + itemProductoCanastaFamiliar.getTipo());
-                    } else if (item instanceof ItemProductoOtro itemProductoOtro) {
-                        out.println("       IVA: " + itemProductoOtro.getPorcentajeIva() + "%");
+                    if (item instanceof ItemProductoFarmacia) {
+                        out.println("       Presentación: " + ((ItemProductoFarmacia) item).getPresentacion());
+                    } else if (item instanceof ItemProductoCanastaFamiliar) {
+                        out.println("       Tipo: " + ((ItemProductoCanastaFamiliar) item).getTipo());
+                    } else if (item instanceof ItemProductoOtro) {
+                        out.println("       IVA: " + ((ItemProductoOtro) item).getPorcentajeIva() + "%");
                     }
                 }
                 out.println("--------------------------------------------------");
@@ -222,14 +214,14 @@ public class UsaPedido {
     private static void actualizarArchivoPedido(Pedido pedido) {
         try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
             for (Pedido p : losPedidos) {
-                out.println( p.getNumero());
-                out.println( p.getFechaHora());
-                out.println( p.getSuCliente().getNombre() + p.getSuCliente().getIdentificacion() + p.getSuCliente().getDireccion());
-                out.println( p.getEstado());
+                out.println("Pedido #" + p.getNumero());
+                out.println("Fecha/Hora: " + p.getFechaHora());
+                out.println("Cliente: " + p.getSuCliente().getNombre() + " - ID: " + p.getSuCliente().getIdentificacion() + " - Dirección: " + p.getSuCliente().getDireccion());
+                out.println("Estado: " + p.getEstado());
                 for (ItemProducto item : p.getSusItemsProductos()) {
-                    out.println("   - " + item.getNombre() + item.getCodigo()  + item.getCantidad()  + item.getPrecio());
+                    out.println("   - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
                 }
-                out.println( p.getObservacion());
+                out.println("Observaciones: " + p.getObservacion());
                 out.println("--------------------------------------------------");
             }
             out.flush();
@@ -332,8 +324,8 @@ public class UsaPedido {
             valorTotalItems += valorTotal;
         }
 
-
-
+        int valorUrgencia = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el valor de urgencia del pedido:"));
+        valorTotalItems += valorUrgencia;
 
         mensaje += "Cantidad de ítems de pedido: " + ultimoPedido.getSusItemsProductos().size() + "\n";
         mensaje += "Valor total de los ítems: $" + valorTotalItems + "\n";
@@ -417,33 +409,36 @@ public class UsaPedido {
 
         try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS, false))) {
             for (Pedido p : losPedidos) {
-                out.println( p.getNumero());
-                out.println( p.getFechaHora());
-                out.println( p.getSuCliente().getNombre()  + p.getSuCliente().getIdentificacion() +  p.getSuCliente().getDireccion());
-                out.println( p.isNormal());
-                out.println( p.getEstado());
-                out.println( p.getObservacion());
-                out.println( p.calcularCantidadItemsPedidos());
-                out.println( p.calcularValorTotalItems());
+                out.println(p.getNumero() +
+                    "--" + p.getFechaHora() +
+                    "--" + p.getSuCliente().getNombre() +
+                    "--" + p.getSuCliente().getIdentificacion() +
+                    "--" + p.getSuCliente().getDireccion() +
+                    "--" + p.isNormal() +
+                    "--" + p.getEstado() +
+                    "--" + p.getObservacion() +
+                    "--" + p.calcularCantidadItemsPedidos() +
+                    "--" + p.calcularValorTotalItems());
 
-                out.println("Productos:");
                 for (ItemProducto item : p.getSusItemsProductos()) {
-                    out.print("   - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
+                    out.print(item.getNombre());
+                    out.print(item.getCodigo());
+                    out.print(item.getCantidad());
+                    out.print(item.getPrecio());
                    
                     if (item instanceof ItemProductoCanastaFamiliar) {
                         ItemProductoCanastaFamiliar canasta = (ItemProductoCanastaFamiliar) item;
-                        out.print(", Tipo: " + canasta.getTipo());
+                        out.print(canasta.getTipo());
                     } else if (item instanceof ItemProductoFarmacia) {
                         ItemProductoFarmacia farmacia = (ItemProductoFarmacia) item;
-                        out.print(", Presentación: " + farmacia.getPresentacion());
+                        out.print(farmacia.getPresentacion());
                     } else if (item instanceof ItemProductoOtro) {
                         ItemProductoOtro otro = (ItemProductoOtro) item;
-                        out.print(", IVA: " + otro.getPorcentajeIva() + "%");
+                        out.print(otro.getPorcentajeIva() + "%");
                     }
                     out.println(); 
                 }
 
-                out.println("--------------------------------------------------");
             }
 
             JOptionPane.showMessageDialog(null, "Archivo de pedidos generado con éxito.");
@@ -531,6 +526,5 @@ public class UsaPedido {
 
 
 }
-
 
 
