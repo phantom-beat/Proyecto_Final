@@ -1,21 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 
-/**
- *
- * @author gabag
- */
 public class ItemProductoCanastaFamiliar extends ItemProducto {
-    String tipo;
+    private String tipo;
 
-    public ItemProductoCanastaFamiliar(int codigo, String nombreP, double cantidad, String presentacion, String tipo, double precio) {
-        super(codigo, nombreP, cantidad, presentacion, tipo, precio);
+    public ItemProductoCanastaFamiliar(int codigo, String nombre, double cantidad, double precio, String tipo) {
+        super(codigo, nombre, codigo, cantidad);
+        this.tipo = tipo;
     }
-    
-
 
     public String getTipo() {
         return tipo;
@@ -26,15 +17,18 @@ public class ItemProductoCanastaFamiliar extends ItemProducto {
     }
 
     @Override
-    public String toString() {
-        return "ItemProductoCanastaFamiliar{" + "tipo=" + tipo + '}';
+    public double calcularValorTotal() {
+        return cantidad * precio;
     }
 
-
-    
+    @Override
+    public String toString() {
+        return super.toString() + ", tipo='" + tipo + "'";
+    }
 }
 
-}
+
+
 
 
 
