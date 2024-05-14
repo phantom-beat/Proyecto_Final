@@ -157,27 +157,26 @@ while (agregarMas) {
         cantidadProducto = Double.parseDouble(cantidadProductoStr);
 
         // Si la categoría es Canasta Familiar
-        switch (categoriaItemProducto) {
-            case 'C':
-                tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
-                ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
-                ((ItemProductoCanastaFamiliar) objItemProductoCanastaFamiliar).setTipo(tipoCanastaFamiliar);
-                productos.add(objItemProductoCanastaFamiliar);
-                break;
-            case 'F':
-                presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
-                ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
-                ((ItemProductoFarmacia) objItemProductoFarmacia).setPresentacion(presentacionFarmacia);
-                productos.add(objItemProductoFarmacia);
-                break;
-            default:
-                porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
-                double precio = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
-                ItemProducto objItemProductoOtro = new ItemProductoOtro(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
-                ((ItemProductoOtro) objItemProductoOtro).setPorcentajeIva(porcentajeIva);
-                productos.add(objItemProductoOtro);
-                break;
-        }
+       switch (categoriaItemProducto) {
+    case 'C':
+        tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
+        double precioProductoCanastaFamiliar = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+        ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoCanastaFamiliar, tipoCanastaFamiliar);
+        productos.add(objItemProductoCanastaFamiliar);
+        break;
+    case 'F':
+        presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
+        double precioProductoFarmacia = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+        ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoFarmacia, presentacionFarmacia);
+        productos.add(objItemProductoFarmacia);
+        break;
+    default:
+        porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
+        double precioProductoOtro = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+        ItemProducto objItemProductoOtro = new ItemProductoOtro(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoOtro, porcentajeIva);
+        productos.add(objItemProductoOtro);
+        break;
+}
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(null, "Entrada inválida. Por favor, ingrese valores numéricos válidos.");
         continue; // Salta a la siguiente iteración del bucle
@@ -187,11 +186,13 @@ while (agregarMas) {
     agregarMas = respuesta == JOptionPane.YES_OPTION;
 }
 
+
 Pedido pedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observacion, true, estado);
 losPedidos.add(pedido);
 guardarPedidoEnArchivo(pedido);
 JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito!");
-
+       }
+}
     private static void guardarPedidoEnArchivo(Pedido pedido) {
     try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
         for (Pedido p : losPedidos) {
@@ -272,8 +273,8 @@ public static void consultarTodosPedidos() {
                         .append("El pedido está normal: ").append(objPedido.isNormal()).append("\n")
                         .append("Estado del pedido: ").append(objPedido.getEstado()).append("\n")
                         .append("Observación del pedido: ").append(objPedido.getObservacion()).append("\n")
-                        .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedido()).append("\n")
-                        .append("Valor total de los items pedidos: ").append(objPedido.calcularValorTotalPagar()).append("\n")
+                        .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedidos()).append("\n")
+                        .append("Valor total de los items pedidos: ").append(objPedido.calcularValorTotalItems()).append("\n")
                         .append("Datos de sus items productos:").append(objPedido.getSusItemsProductos()).append("\n\n");
     }
     
@@ -624,12 +625,13 @@ private static void recuperarPedidosDesdeArchivoTexto() {
                 String codigoProducto = partes[1].split(":")[1].trim();
                 int cantidadProducto = Integer.parseInt(partes[2].split(":")[1].trim());
                 double precioProducto = Double.parseDouble(partes[3].split(":")[1].trim().substring(1)); // Quitar el símbolo de dólar
-                productos.add(new ItemProducto(codigoProducto, nombreProducto, cantidadProducto, precioProducto) {
+               productos.add(new ItemProducto(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto) {
                     @Override
                     public double calcularValorTotal() {
-                        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                        throw new UnsupportedOperationException(""); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
                     }
-                }); // Añadir el producto
+                }); 
+                   
             }
         }
 
