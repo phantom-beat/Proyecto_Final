@@ -1,17 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 
-/**
- *
- * @author gabag
- */
+
 public class Cliente {
-    String identificacion;
-    String nombre;
-    String direccion;
+    private String identificacion;
+    private String nombre;
+    private String direccion;
 
     public Cliente(String identificacion, String nombre, String direccion) {
         this.identificacion = identificacion;
@@ -45,8 +38,11 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "Cliente{" + "identificacion=" + identificacion + ", nombre=" + nombre + ", direccion=" + direccion + '}';
+        return "Cliente{" +
+               "identificacion='" + identificacion + '\'' +
+               ", nombre='" + nombre + '\'' +
+               ", direccion='" + direccion + '\'' +
+               '}';
     }
-    
-    
 }
+
