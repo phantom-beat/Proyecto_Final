@@ -1,7 +1,10 @@
 package modelo;
 
+
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import modelo.Cliente;
+import modelo.ItemProducto;
 
 public class Pedido {
     private int numero;
@@ -78,21 +81,35 @@ public class Pedido {
     public void setEstado(char estado) {
         this.estado = estado;
     }
+    // calcula la cantidad total de los item
+    public int calcularCantidadItemsPedidos() {
+    int cantidadTotal = 0;
+    for (ItemProducto itemProducto : susItemsProductos) {
+        cantidadTotal += itemProducto.getCantidad();
+    }
+    return cantidadTotal;
+}
 
     // Calcula el total de los ítems en el pedido
     public double calcularValorTotalItems() {
-        double total = 0;
-        for (ItemProducto item : susItemsProductos) {
-            total += item.calcularValorTotal();
-        }
-        return total;
+    double valorTotal = 0;
+    for (ItemProducto itemProducto : susItemsProductos) {
+        valorTotal += itemProducto.calcularValorTotal();
     }
+    return valorTotal;
+}
+    
 
     // Calcula el valor total a pagar, incluyendo un valor adicional en caso de urgencia
-    public double calcularValorTotalPagar(int valorUrgencia) {
-        double totalItems = calcularValorTotalItems();
-        return totalItems + valorUrgencia;
+    public double calcularValorTotalPagar() {
+    double valorTotalPagar = 0;
+    for (ItemProducto itemProducto : susItemsProductos) {
+        valorTotalPagar += itemProducto.calcularValorTotal();
     }
+    return valorTotalPagar;
+    
+    
+}
 
     @Override
     public String toString() {
@@ -106,5 +123,11 @@ public class Pedido {
                ", estado=" + estado +
                '}';
     }
+    
+    
+    public double calcularValorTotalPagar(double valorUrgencia) {
+    double valorTotalPagar = calcularValorTotalItems() + valorUrgencia;
+    return valorTotalPagar;
+    
 }
-
+}
