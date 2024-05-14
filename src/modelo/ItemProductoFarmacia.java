@@ -1,21 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 
-/**
- *
- * @author gabag
- */
-public class ItemProductoFarmacia extends ItemProducto{
-    String presentacion;
+public class ItemProductoFarmacia extends ItemProducto {
+    private String presentacion;
 
-    public ItemProductoFarmacia(int codigo, String nombreP, double cantidad, String presentacion, String tipo, double precio) {
-        super(codigo, nombreP, cantidad, presentacion, tipo, precio);
+    public ItemProductoFarmacia(int codigo, String nombre, double cantidad, double precio, String presentacion) {
+        super(codigo, nombre, cantidad, precio);
+        this.presentacion = presentacion;
     }
-    
-    
 
     public String getPresentacion() {
         return presentacion;
@@ -26,9 +17,13 @@ public class ItemProductoFarmacia extends ItemProducto{
     }
 
     @Override
-    public String toString() {
-        return "ItemProductoFarmacia{" + "presentacion=" + presentacion + '}';
+    public double calcularValorTotal() {
+        return cantidad * precio; // Sin IVA
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return super.toString() + ", presentacion='" + presentacion + "'";
+    }
 }
+
