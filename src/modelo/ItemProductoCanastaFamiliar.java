@@ -4,9 +4,10 @@ public class ItemProductoCanastaFamiliar extends ItemProducto {
     private String tipo;
 
     public ItemProductoCanastaFamiliar(int codigo, String nombre, double cantidad, double precio, String tipo) {
-        super(codigo, nombre, codigo, cantidad);
+        super(codigo, nombre, cantidad, precio);
         this.tipo = tipo;
     }
+
 
     public String getTipo() {
         return tipo;
@@ -18,7 +19,7 @@ public class ItemProductoCanastaFamiliar extends ItemProducto {
 
     @Override
     public double calcularValorTotal() {
-        return cantidad * precio;
+        return cantidad * precio; // Sin IVA
     }
 
     @Override
@@ -26,8 +27,6 @@ public class ItemProductoCanastaFamiliar extends ItemProducto {
         return super.toString() + ", tipo='" + tipo + "'";
     }
 }
-
-
 
 
 
