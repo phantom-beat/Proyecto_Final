@@ -22,17 +22,12 @@ import static javax.swing.UIManager.get;
 import modelo.ItemProductoCanastaFamiliar;
 import modelo.ItemProductoFarmacia;
 
+
+    
 public class UsaPedido {
     private static final LinkedList<Pedido> losPedidos = new LinkedList<>();
     private static final String ARCHIVO_PEDIDOS = "pedidos.txt";
     
-
-
-        /**
-         *
-         * @param args
-         */
-
     public static void main(String[] args) {
         // Lista de opciones para el menú
         String[] opciones = {
@@ -53,7 +48,6 @@ public class UsaPedido {
 
         do {
             // Construye un mensaje con saltos de línea para mostrar las opciones verticalmente
-            //tambien sirve para seleccionaruna opcion
             StringBuilder menuMensaje = new StringBuilder("Seleccione una opción:\n");
             for (int i = 0; i < opciones.length; i++) {
                 menuMensaje.append(i).append(". ").append(opciones[i]).append("\n");
@@ -72,15 +66,22 @@ public class UsaPedido {
                     opcion = Integer.parseInt(input); // Convertir a entero
                 } catch (NumberFormatException e) {
                     System.err.println("Entrada no válida. Ingrese un número.");
-                    continue; // Volver a pedir la entrada tambien se puede utlizar un bucle 
+                    continue; // Volver a pedir la entrada
                 }
 
                 // Switch para las diferentes opciones
                 switch (opcion) {
                     case 0 -> crearPedido();
-                    case 1 -> actualizarEstadoPedido();
+                    case 1 -> {
+                        int numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido a actualizar:"));
+                        char estadoPedido = JOptionPane.showInputDialog("Ingrese el nuevo estado del pedido (A, D, C):").charAt(0);
+                        actualizarEstadoPedido(numeroPedido, estadoPedido);
+                    }
                     case 2 -> consultarTodosPedidos();
-                    case 3 -> consultarPedidoNumero();
+                    case 3 -> {
+                        int numero = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido a consultar:"));
+                        consultarPedidoNumero(numero);
+                    }
                     case 4 -> consultarUltimoPedido();
                     case 5 -> eliminarTodosPedidos();
                     case 6 -> eliminarUnPedido();
@@ -91,7 +92,7 @@ public class UsaPedido {
                         JOptionPane.showMessageDialog(null, "Saliendo del programa.");
                         System.exit(0);
                     }
-                    default -> System.err.println("Opción no válida."); //da error si digita mal 
+                    default -> System.err.println("Opción no válida.");
                 }
             } else {
                 System.out.println("Operación cancelada por el usuario.");
@@ -143,8 +144,8 @@ while (agregarMas) {
     String cantidadProductoStr = JOptionPane.showInputDialog("Ingrese la cantidad del producto:");
     double cantidadProducto;
     char categoriaItemProducto;
-    String tipoCanastaFamiliar = null;
-    String presentacionFarmacia = null;
+    String tipoCanastaFamiliar = "";
+    String presentacionFarmacia = "";
     double porcentajeIva = 0;
 
     // Solicitamos al usuario ingresar la categoría del producto hasta que sea válida
@@ -157,26 +158,27 @@ while (agregarMas) {
         cantidadProducto = Double.parseDouble(cantidadProductoStr);
 
         // Si la categoría es Canasta Familiar
-       switch (categoriaItemProducto) {
-    case 'C':
-        tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
-        double precioProductoCanastaFamiliar = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
-        ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoCanastaFamiliar, tipoCanastaFamiliar);
-        productos.add(objItemProductoCanastaFamiliar);
-        break;
-    case 'F':
-        presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
-        double precioProductoFarmacia = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
-        ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoFarmacia, presentacionFarmacia);
-        productos.add(objItemProductoFarmacia);
-        break;
-    default:
-        porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
-        double precioProductoOtro = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
-        ItemProducto objItemProductoOtro = new ItemProductoOtro(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoOtro, porcentajeIva);
-        productos.add(objItemProductoOtro);
-        break;
-}
+        switch (categoriaItemProducto) {
+            case 'C' -> {
+                tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
+                ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
+                ((ItemProductoCanastaFamiliar) objItemProductoCanastaFamiliar).setTipo(tipoCanastaFamiliar);
+                productos.add(objItemProductoCanastaFamiliar);
+            }
+            case 'F' -> {
+                presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
+                ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
+                ((ItemProductoFarmacia) objItemProductoFarmacia).setPresentacion(presentacionFarmacia);
+                productos.add(objItemProductoFarmacia);
+            }
+            default -> {
+                porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
+                double precio = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+                ItemProducto objItemProductoOtro = new ItemProductoOtro(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
+                ((ItemProductoOtro) objItemProductoOtro).setPorcentajeIva(porcentajeIva);
+                productos.add(objItemProductoOtro);
+            }
+        }
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(null, "Entrada inválida. Por favor, ingrese valores numéricos válidos.");
         continue; // Salta a la siguiente iteración del bucle
@@ -186,14 +188,13 @@ while (agregarMas) {
     agregarMas = respuesta == JOptionPane.YES_OPTION;
 }
 
-
 Pedido pedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observacion, true, estado);
 losPedidos.add(pedido);
 guardarPedidoEnArchivo(pedido);
 JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito!");
        }
 }
-    private static void guardarPedidoEnArchivo(Pedido pedido) {
+private static void guardarPedidoEnArchivo(Pedido pedido) {
     try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
         for (Pedido p : losPedidos) {
             out.println("Pedido #" + p.getNumero());
@@ -214,9 +215,9 @@ JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito!");
 
 
 private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) {
-    // Verificar si el estado ingresado es válido (C o D)
-    if (estadoPedido != 'C' && estadoPedido != 'D') {
-        JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese C (cancelado/anulado) o D (despachado).");
+    // Verificar si el estado ingresado es válido (A, D o C)
+    if (estadoPedido != 'A' && estadoPedido != 'D' && estadoPedido != 'C') {
+        JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese A (abierto), D (despachado) o C (cancelado/anulado).");
         return;
     }
 
@@ -229,19 +230,15 @@ private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) 
         }
     }
 
-    // Si no se encontró el pedido, mostrar un mensaje de error
-    if (pedidoEncontrado == null) {
-        JOptionPane.showMessageDialog(null, "No se encontró el pedido con número " + numeroPedido);
-        return;
+    if (pedidoEncontrado != null) {
+        // Actualizar el estado del pedido
+        pedidoEncontrado.setEstado(estadoPedido);
+        JOptionPane.showMessageDialog(null, "Estado del pedido #" + numeroPedido + " actualizado correctamente a: " + estadoPedido);
+    } else {
+        JOptionPane.showMessageDialog(null, "Pedido no encontrado con el número: " + numeroPedido);
     }
-
-    // Actualizar el estado del pedido
-    pedidoEncontrado.setEstado(estadoPedido);
-    JOptionPane.showMessageDialog(null, "El estado del pedido ha sido actualizado.");
-
-    // Guardar los cambios en el archivo de pedidos
-    actualizarArchivoPedido(pedidoEncontrado);
 }
+
 
     private static void actualizarArchivoPedido(Pedido pedido) {
     // Sobrescribe el archivo completo para actualizar el estado de un pedido específico
@@ -273,8 +270,8 @@ public static void consultarTodosPedidos() {
                         .append("El pedido está normal: ").append(objPedido.isNormal()).append("\n")
                         .append("Estado del pedido: ").append(objPedido.getEstado()).append("\n")
                         .append("Observación del pedido: ").append(objPedido.getObservacion()).append("\n")
-                        .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedidos()).append("\n")
-                        .append("Valor total de los items pedidos: ").append(objPedido.calcularValorTotalItems()).append("\n")
+                        .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedido()).append("\n")
+                        .append("Valor total de los items pedidos: ").append(objPedido.calcularValorTotalPagar()).append("\n")
                         .append("Datos de sus items productos:").append(objPedido.getSusItemsProductos()).append("\n\n");
     }
     
@@ -287,104 +284,63 @@ public static void consultarTodosPedidos() {
 
 
 
-private static void consultarPedidoNumero() {
-    // Solicita al usuario que ingrese el número del pedido que desea consultar
- int numeroPedido;
-        try {
-            numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido que desea consultar:"));
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido.");
-            return;
+private static  String consultarPedidoNumero(int numeroPedido) {
+    // Intenta encontrar el pedido con el número dado
+    Pedido pedidoEncontrado = null;
+
+    for (Pedido p : losPedidos) {
+        if (p.getNumero() == numeroPedido) {
+            pedidoEncontrado = p;
+            break;
         }
+    }
 
-    try {
-        // Convierte la cadena ingresada por el usuario en un número entero
+    // Si el pedido fue encontrado, construye un mensaje con su información
+    if (pedidoEncontrado != null) {
+        StringBuilder sb = new StringBuilder();
 
-        Pedido pedidoEncontrado = null;
+        sb.append("Pedido #").append(pedidoEncontrado.getNumero()).append("\n");
+        sb.append("Fecha/Hora: ").append(pedidoEncontrado.getFechaHora()).append("\n");
+        sb.append("Cliente: ").append(pedidoEncontrado.getSuCliente().getNombre()).append(" - ID: ").append(pedidoEncontrado.getSuCliente().getIdentificacion()).append("\n");
+        sb.append("Dirección: ").append(pedidoEncontrado.getSuCliente().getDireccion()).append("\n");
+        sb.append("Estado: ").append(pedidoEncontrado.getEstado()).append("\n");
+        sb.append("Observaciones: ").append(pedidoEncontrado.getObservacion()).append("\n");
+        sb.append("Productos:\n");
 
-        // Itera sobre la lista de pedidos
-        for (Pedido p : losPedidos) {
-            // Compara el número del pedido actual con el número ingresado por el usuario
-            if (p.getNumero() == numeroPedido) {
-                // Si coinciden, asigna el pedido actual a la variable pedidoEncontrado
-                pedidoEncontrado = p;
-                // Sale del bucle for al encontrar el pedido
-                break;
-            }
-        }
+        double valorTotalItems = 0;
 
-        // Verifica si se encontró un pedido con el número ingresado
-        if (pedidoEncontrado != null) {
-            // Crea un objeto StringBuilder para construir la cadena de texto con la información del pedido
-            StringBuilder sb = new StringBuilder();
+        for (ItemProducto item : pedidoEncontrado.getSusItemsProductos()) {
+            sb.append(" - ").append(item.getNombre()).append(", Código: ").append(item.getCodigo())
+                .append(", Cantidad: ").append(item.getCantidad()).append(", Precio: $").append(item.getPrecio()).append("\n");
 
-            // Agrega la información básica del pedido al StringBuilder
-            sb.append("Pedido #").append(pedidoEncontrado.getNumero()).append("\n");
-            sb.append("Fecha/Hora: ").append(pedidoEncontrado.getFechaHora()).append("\n");
-            sb.append("Cliente: ").append(pedidoEncontrado.getSuCliente().getNombre()).append(" - ID: ").append(pedidoEncontrado.getSuCliente().getIdentificacion()).append("\n");
-            sb.append("Dirección: ").append(pedidoEncontrado.getSuCliente().getDireccion()).append("\n");
-            sb.append("Estado: ").append(pedidoEncontrado.getEstado()).append("\n");
-            sb.append("Observaciones: ").append(pedidoEncontrado.getObservacion()).append("\n");
-            sb.append("Productos:\n");
-
-            // Inicializa la variable valorTotalItems para almacenar el valor total de los ítems
-            double valorTotalItems = 0;
-
-            // Itera sobre los ítems del pedido
-            for (ItemProducto item : pedidoEncontrado.getSusItemsProductos()) {
-                // Agrega la información básica del ItemProducto al StringBuilder
-                sb.append(" - ").append(item.getNombre()).append(", Código: ").append(item.getCodigo())
-                        .append(", Cantidad: ").append(item.getCantidad()).append(", Precio: $").append(item.getPrecio()).append("\n");
-
-            String datoEspecifico = "";
-            if (item instanceof ItemProductoFarmacia) {
-                datoEspecifico = "Presentación: " + ((ItemProductoFarmacia) item).getPresentacion();
-            } else if (item instanceof ItemProductoCanastaFamiliar) {
-                datoEspecifico = "Tipo: " + ((ItemProductoCanastaFamiliar) item).getTipo();
-            } else if (item instanceof ItemProductoOtro) {
-                double porcentajeIva = ((ItemProductoOtro) item).getPorcentajeIva();
-                if (porcentajeIva != 0) {
-                    datoEspecifico = "Porcentaje IVA: " + porcentajeIva + "%";
+            // Añade información específica según el tipo de producto
+            switch (item) {
+                case ItemProductoFarmacia itemProductoFarmacia -> sb.append("   Presentación: ").append(itemProductoFarmacia.getPresentacion()).append("\n");
+                case ItemProductoCanastaFamiliar itemProductoCanastaFamiliar -> sb.append("   Tipo: ").append(itemProductoCanastaFamiliar.getTipo()).append("\n");
+                case ItemProductoOtro itemProductoOtro -> {
+                    double porcentajeIva = itemProductoOtro.getPorcentajeIva();
+                    if (porcentajeIva != 0) {
+                        sb.append("   Porcentaje IVA: ").append(porcentajeIva).append("%\n");
+                    }
+                }
+                default -> {
                 }
             }
 
-    
-
-
-                // Si hay un dato específico, lo agrega al StringBuilder
-                if (!datoEspecifico.isEmpty()) {
-                    sb.append("   ").append(datoEspecifico).append("\n");
-                }
-
-                // Calcula el valor total del ItemProducto y lo suma al valor total de los ítems
-                double valorTotalItem = item.getCantidad() * item.getPrecio();
-                valorTotalItems += valorTotalItem;
-            }
-
-            // Agrega la cantidad de ítems del pedido, el valor total de los ítems y el valor total a pagar al StringBuilder
-            sb.append("Cantidad de ítems de pedido: ").append(pedidoEncontrado.getSusItemsProductos().size()).append("\n");
-            sb.append("Valor total de los ítems: $").append(valorTotalItems).append("\n");
-            sb.append("Valor total a pagar: $").append(valorTotalItems); // Suponiendo que no hay descuentos
-
-            // Crea un JTextArea con el texto construido en el StringBuilder
-            JTextArea textArea = new JTextArea(sb.toString());
-            textArea.setEditable(false); // Hace que el área de texto no sea editable
-
-            // Crea un JScrollPane para hacer que el área de texto sea desplazable
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            scrollPane.setPreferredSize(new Dimension(500, 300)); // Establece un tamaño preferido para el JScrollPane
-
-            // Muestra el JScrollPane en un cuadro de diálogo con un título y un icono de información
-            JOptionPane.showMessageDialog(null, scrollPane, "Consulta de Pedido", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            // Si no se encontró un pedido con el número ingresado, muestra un mensaje de advertencia
-            JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
+            valorTotalItems += item.getCantidad() * item.getPrecio();
         }
-    } catch (NumberFormatException e) {
-        // Si el usuario ingresa un valor no numérico, muestra un mensaje de error
-        JOptionPane.showMessageDialog(null, "Número de pedido no válido. Por favor, ingrese un número entero.");
+
+        sb.append("Cantidad de ítems de pedido: ").append(pedidoEncontrado.getSusItemsProductos().size()).append("\n");
+        sb.append("Valor total de los ítems: $").append(valorTotalItems).append("\n");
+        sb.append("Valor total a pagar: $").append(valorTotalItems); // Suponiendo que no hay descuentos
+
+        return sb.toString();
+    } else {
+        // Si el pedido no fue encontrado, devuelve un mensaje indicando eso
+        return "No se encontró un pedido con el número " + numeroPedido;
     }
 }
+
 
 
   private static void consultarUltimoPedido() {
@@ -399,8 +355,9 @@ private static void consultarPedidoNumero() {
         Pedido ultimoPedido = losPedidos.getLast();
 
         // Creamos un string para almacenar la información del pedido
-        String mensaje = "Último Pedido:\n"
-                + "Pedido #" + ultimoPedido.getNumero() + "\n"
+        String mensaje = """
+                         \u00daltimo Pedido:
+                         Pedido #""" + ultimoPedido.getNumero() + "\n"
                 + "Fecha/Hora: " + ultimoPedido.getFechaHora() + "\n"
                 + "Cliente: " + ultimoPedido.getSuCliente().getNombre()
                 + " - ID: " + ultimoPedido.getSuCliente().getIdentificacion()
@@ -571,10 +528,6 @@ private static void generarArchivoTextoDePedidos() {
         JOptionPane.showMessageDialog(null, "Error al escribir el archivo de pedidos: " + e.getMessage());
     }
 }
-//faltan las observaciones 
-
-//ser mas especifico con lasdirecciones 
-    
 
 //malo
 private static void recuperarPedidosDesdeArchivoTexto() {
@@ -625,13 +578,12 @@ private static void recuperarPedidosDesdeArchivoTexto() {
                 String codigoProducto = partes[1].split(":")[1].trim();
                 int cantidadProducto = Integer.parseInt(partes[2].split(":")[1].trim());
                 double precioProducto = Double.parseDouble(partes[3].split(":")[1].trim().substring(1)); // Quitar el símbolo de dólar
-               productos.add(new ItemProducto(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto) {
+                productos.add(new ItemProducto(codigoProducto, nombreProducto, cantidadProducto, precioProducto) {
                     @Override
                     public double calcularValorTotal() {
-                        throw new UnsupportedOperationException(""); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
                     }
-                }); 
-                   
+                }); // Añadir el producto
             }
         }
 
