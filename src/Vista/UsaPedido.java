@@ -4,7 +4,9 @@ import modelo.*;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -67,7 +69,7 @@ public class UsaPedido {
                 case 6 -> eliminarUnPedido();
                 case 7 -> eliminarUltimoPedido();
                 case 8 -> generarArchivoTextoDePedidos();
-                case 9 -> recuperarPedidosDesdeArchivoTexto();
+                case 9 -> recuperarDesdeArchivoTextoDePedidos();
                 case 10 -> {
                     JOptionPane.showMessageDialog(null, "Saliendo del programa.");
                     System.exit(0);
@@ -162,7 +164,7 @@ public class UsaPedido {
     }
 
     private static void guardarPedidoEnArchivo() {
-        try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
+        try (PrintWriter out = new PrintWriter(new FileWriter("ARCHIVO_PEDIDOS.txt"))) {
             for (Pedido p : losPedidos) {
                 out.println("Pedido #" + p.getNumero());
                 out.println("Fecha/Hora: " + p.getFechaHora());
@@ -170,18 +172,22 @@ public class UsaPedido {
                 out.println("Estado: " + p.getEstado());
                 out.println("Observaciones: " + p.getObservacion());
                 out.println("Productos:");
+
                 for (ItemProducto item : p.getSusItemsProductos()) {
-                    out.println("   - " + item.getClass().getSimpleName() + " - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
+                    out.println(" - " + item.getClass().getSimpleName() + " - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
+
                     if (item instanceof ItemProductoFarmacia) {
-                        out.println("       Presentación: " + ((ItemProductoFarmacia) item).getPresentacion());
+                        out.println(" Presentación: " + ((ItemProductoFarmacia) item).getPresentacion());
                     } else if (item instanceof ItemProductoCanastaFamiliar) {
-                        out.println("       Tipo: " + ((ItemProductoCanastaFamiliar) item).getTipo());
+                        out.println(" Tipo: " + ((ItemProductoCanastaFamiliar) item).getTipo());
                     } else if (item instanceof ItemProductoOtro) {
-                        out.println("       IVA: " + ((ItemProductoOtro) item).getPorcentajeIva() + "%");
+                        out.println(" IVA: " + ((ItemProductoOtro) item).getPorcentajeIva() + "%");
                     }
                 }
+
                 out.println("--------------------------------------------------");
             }
+
             out.flush();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error al guardar los pedidos en el archivo: " + e.getMessage());
@@ -211,45 +217,56 @@ public class UsaPedido {
         }
     }
 
-    private static void actualizarArchivoPedido(Pedido pedido) {
-        try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
-            for (Pedido p : losPedidos) {
-                out.println("Pedido #" + p.getNumero());
-                out.println("Fecha/Hora: " + p.getFechaHora());
-                out.println("Cliente: " + p.getSuCliente().getNombre() + " - ID: " + p.getSuCliente().getIdentificacion() + " - Dirección: " + p.getSuCliente().getDireccion());
-                out.println("Estado: " + p.getEstado());
-                for (ItemProducto item : p.getSusItemsProductos()) {
-                    out.println("   - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
-                }
-                out.println("Observaciones: " + p.getObservacion());
-                out.println("--------------------------------------------------");
-            }
-            out.flush();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar el archivo de pedidos: " + e.getMessage());
-        }
-    }
+private static void actualizarArchivoPedido(Pedido pedido) {
+    try (PrintWriter out = new PrintWriter(new FileWriter("ARCHIVO_PEDIDOS.txt"))) {
+        for (Pedido p : losPedidos) {
+            out.println("Pedido #" + p.getNumero());
+            out.println("Fecha/Hora: " + p.getFechaHora());
+            out.println("Cliente: " + p.getSuCliente().getNombre() + " - ID: " + p.getSuCliente().getIdentificacion() + " - Dirección: " + p.getSuCliente().getDireccion());
+            out.println("Estado: " + p.getEstado());
 
-    public static void consultarTodosPedidos() {
-        StringBuilder resultadoBuilder = new StringBuilder("REPORTE DE TODOS LOS PEDIDOS \n\n");
-        for (Pedido objPedido : losPedidos) {
-            resultadoBuilder.append("Número del pedido: ").append(objPedido.getNumero()).append("\n")
-                            .append("Fecha-hora del pedido: ").append(objPedido.getFechaHora()).append("\n")
-                            .append("Datos del cliente: ").append(objPedido.getSuCliente()).append("\n")
-                            .append("El pedido está normal: ").append(objPedido.isNormal()).append("\n")
-                            .append("Estado del pedido: ").append(objPedido.getEstado()).append("\n")
-                            .append("Observación del pedido: ").append(objPedido.getObservacion()).append("\n")
-                            .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedidos()).append("\n")
-                            .append("Valor total de los items pedidos: ").append(objPedido.calcularValorTotalItems()).append("\n")
-                            .append("Datos de sus items productos:").append(objPedido.getSusItemsProductos()).append("\n\n");
+            for (ItemProducto item : p.getSusItemsProductos()) {
+                out.println(" - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
+            }
+
+            out.println("Observaciones: " + p.getObservacion());
+            out.println("--------------------------------------------------");
+        }
+
+        out.flush();
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(null, "Error al actualizar el archivo de pedidos: " + e.getMessage());
+    }
+}
+
+   public static void consultarTodosPedidos() {
+    StringBuilder resultadoBuilder = new StringBuilder("REPORTE DE TODOS LOS PEDIDOS \n\n");
+    for (Pedido objPedido : losPedidos) {
+        resultadoBuilder.append("Número del pedido: ").append(objPedido.getNumero()).append("\n")
+            .append("Fecha-hora del pedido: ").append(objPedido.getFechaHora()).append("\n")
+            .append("Datos del cliente: ").append(objPedido.getSuCliente()).append("\n")
+            .append("El pedido está normal: ").append(objPedido.isNormal()).append("\n")
+            .append("Estado del pedido: ").append(objPedido.getEstado()).append("\n")
+            .append("Observación del pedido: ").append(objPedido.getObservacion()).append("\n")
+            .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedidos()).append("\n")
+            .append("Valor total de los items pedidos: ").append(String.format("%.2f", objPedido.calcularValorTotalItems())).append("\n");
+        
+        // Verificar si el pedido es normal o urgente
+        if (objPedido.isNormal()) {
+            resultadoBuilder.append("Valor total a pagar (pedido normal): ").append(String.format("%.2f", objPedido.calcularValorTotalPagar())).append("\n");
+        } else {
+            resultadoBuilder.append("Valor total a pagar (pedido urgente): ").append(String.format("%.2f", objPedido.calcularValorTotalPagar(0))).append("\n");
         }
         
-        JTextArea textArea = new JTextArea(resultadoBuilder.toString());
-        textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(500, 400));
-        JOptionPane.showMessageDialog(null, scrollPane, "Todos los Pedidos", JOptionPane.INFORMATION_MESSAGE);
+        resultadoBuilder.append("Datos de sus items productos:").append(objPedido.getSusItemsProductos()).append("\n\n");
     }
+
+    JTextArea textArea = new JTextArea(resultadoBuilder.toString());
+    textArea.setEditable(false);
+    JScrollPane scrollPane = new JScrollPane(textArea);
+    scrollPane.setPreferredSize(new Dimension(500, 400));
+    JOptionPane.showMessageDialog(null, scrollPane, "Todos los Pedidos", JOptionPane.INFORMATION_MESSAGE);
+}
 
     private static String consultarPedidoNumero(int numeroPedido) {
         Pedido pedidoEncontrado = losPedidos.stream()
@@ -401,130 +418,135 @@ public class UsaPedido {
         }
     }
 
-    private static void generarArchivoTextoDePedidos() {
-        if (losPedidos.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay pedidos para exportar.");
-            return;
-        }
+private static void generarArchivoTextoDePedidos() {
+    if (losPedidos.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "No hay pedidos para exportar.");
+        return;
+    }
 
-        try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS, false))) {
-            for (Pedido p : losPedidos) {
-                out.println(p.getNumero() +
-                    "--" + p.getFechaHora() +
+    try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("ARCHIVO_PEDIDOS.txt")))) {
+        for (Pedido p : losPedidos) {
+            out.println(p.getNumero() + "--" + p.getFechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")) +
                     "--" + p.getSuCliente().getNombre() +
                     "--" + p.getSuCliente().getIdentificacion() +
                     "--" + p.getSuCliente().getDireccion() +
-                    "--" + p.isNormal() +
+                    "--" + (p.isNormal() ? 'N' : 'E') +
                     "--" + p.getEstado() +
                     "--" + p.getObservacion() +
                     "--" + p.calcularCantidadItemsPedidos() +
                     "--" + p.calcularValorTotalItems());
 
-                for (ItemProducto item : p.getSusItemsProductos()) {
-                    out.print(item.getNombre());
-                    out.print(item.getCodigo());
-                    out.print(item.getCantidad());
-                    out.print(item.getPrecio());
-                   
-                    if (item instanceof ItemProductoCanastaFamiliar) {
-                        ItemProductoCanastaFamiliar canasta = (ItemProductoCanastaFamiliar) item;
-                        out.print(canasta.getTipo());
-                    } else if (item instanceof ItemProductoFarmacia) {
-                        ItemProductoFarmacia farmacia = (ItemProductoFarmacia) item;
-                        out.print(farmacia.getPresentacion());
-                    } else if (item instanceof ItemProductoOtro) {
-                        ItemProductoOtro otro = (ItemProductoOtro) item;
-                        out.print(otro.getPorcentajeIva() + "%");
-                    }
-                    out.println(); 
+            for (ItemProducto item : p.getSusItemsProductos()) {
+                out.print("   -" + item.getNombre() + "--" + item.getCodigo() + "--" + item.getCantidad() + "--" + item.getPrecio());
+
+                if (item instanceof ItemProductoCanastaFamiliar) {
+                    ItemProductoCanastaFamiliar canasta = (ItemProductoCanastaFamiliar) item;
+                    out.print("--Tipo:" + canasta.getTipo());
+                } else if (item instanceof ItemProductoFarmacia) {
+                    ItemProductoFarmacia farmacia = (ItemProductoFarmacia) item;
+                    out.print("--Presentación:" + farmacia.getPresentacion());
+                } else if (item instanceof ItemProductoOtro) {
+                    ItemProductoOtro otro = (ItemProductoOtro) item;
+                    out.print("--Iva:" + String.format("%.2f%%", otro.getPorcentajeIva() * 100));
                 }
 
+                out.println();
             }
-
-            JOptionPane.showMessageDialog(null, "Archivo de pedidos generado con éxito.");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al escribir el archivo de pedidos: " + e.getMessage());
         }
+
+        JOptionPane.showMessageDialog(null, "Archivo de pedidos generado con éxito.");
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(null, "Error al escribir el archivo de pedidos: " + e.getMessage());
     }
+}
 
 
-    private static void recuperarPedidosDesdeArchivoTexto() {
-        losPedidos.clear(); 
+ public static void recuperarDesdeArchivoTextoDePedidos() {
+    losPedidos.clear(); // Limpiar la lista de pedidos existente
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(ARCHIVO_PEDIDOS), StandardCharsets.UTF_8))) {
-            String line;
-            Pedido pedidoActual = null;
-            LinkedList<ItemProducto> productos = new LinkedList<>();
+    try {
+        // Definir archivo desde el cual se va a recuperar información solicitada
+        String nombreArchivo = "ARCHIVO_PEDIDOS.txt";
 
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("Número del pedido:")) {
-                    if (pedidoActual != null) { 
-                        pedidoActual.setSusItemsProductos(productos);
-                        losPedidos.add(pedidoActual);
-                    }
-                    int numero = Integer.parseInt(line.split(":")[1].trim());
-                    pedidoActual = new Pedido();
-                    pedidoActual.setNumero(numero);
-                    productos = new LinkedList<>();
-                } else if (line.startsWith("Fecha-hora del pedido:")) {
-                    String dateTimePart = line.split(":")[1].trim();
-                    try {
-                        LocalDateTime fechaHora = LocalDateTime.parse(dateTimePart, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
-                        pedidoActual.setFechaHora(fechaHora);
-                    } catch (DateTimeParseException e) {
-                        try {
-                            LocalDateTime fechaHora = LocalDateTime.parse(dateTimePart, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH"));
-                            pedidoActual.setFechaHora(fechaHora);
-                        } catch (DateTimeParseException ex) {
-                            System.out.println("Fecha y hora completamente inválidas: " + dateTimePart);
-                            pedidoActual.setFechaHora(null);
-                        }
-                    }
-                } else if (line.startsWith("Datos del cliente:")) {
-                    String[] clienteParts = line.split(" - ");
-                    if (clienteParts.length >= 3) {
-                        String clienteNombre = clienteParts[0].split(":")[1].trim();
-                        String clienteID = clienteParts[1].split(":")[1].trim();
-                        String clienteDireccion = clienteParts[2].split(":")[1].trim();
-                        Cliente cliente = new Cliente(clienteID, clienteNombre, clienteDireccion);
-                        pedidoActual.setSuCliente(cliente);
-                    }
-                } else if (line.startsWith("Estado del pedido:")) {
-                    char estado = line.split(":")[1].trim().charAt(0);
-                    pedidoActual.setEstado(estado);
-                } else if (line.startsWith("Observación del pedido:")) {
-                    String observacion = line.split(":")[1].trim();
-                    pedidoActual.setObservacion(observacion);
-                } else if (line.startsWith("   -")) {
-                    try {
-                        String productDetails = line.trim().substring(2).trim();
-                        String[] parts = productDetails.split(", ");
-                        if (parts.length >= 5) {
-                            String nombreProducto = parts[0].split(": ")[1].trim();
-                            int codigo = Integer.parseInt(parts[1].split(": ")[1].trim());
-                            double cantidad = Double.parseDouble(parts[2].split(": ")[1].trim());
-                            double precio = Double.parseDouble(parts[3].split(": $")[1].trim());
-                            String presentacion = parts[4].split(": ")[1].trim();
-                            ItemProducto producto = new ItemProductoFarmacia(codigo, nombreProducto, cantidad, precio, presentacion);
-                            productos.add(producto);
-                        } else {
-                            System.out.println("Información del producto incompleta o mal formada en la línea: " + line);
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Error parsing product line: " + line);
-                    }
+        // Creación del flujo de entrada
+        BufferedReader entrada = new BufferedReader(new FileReader(nombreArchivo));
+
+        String line;
+        Pedido pedidoActual = null;
+        LinkedList<ItemProducto> productos = new LinkedList<>();
+
+        while ((line = entrada.readLine()) != null) {
+            if (line.startsWith("Número del pedido:")) {
+                // Crear un nuevo pedido cuando se encuentre la línea de número de pedido
+                if (pedidoActual != null) {
+                    pedidoActual.setSusItemsProductos(productos);
+                    losPedidos.add(pedidoActual);
+                }
+                int numero = Integer.parseInt(line.split("--")[1].trim());
+                pedidoActual = new Pedido();
+                pedidoActual.setNumero(numero);
+                productos = new LinkedList<>();
+            } else if (line.startsWith("Fecha-hora del pedido:")) {
+                // Establecer la fecha y hora del pedido
+                String dateTimePart = line.split("--")[1].trim();
+                LocalDateTime fechaHora = LocalDateTime.parse(dateTimePart, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                pedidoActual.setFechaHora(fechaHora);
+            } else if (line.startsWith("Datos del cliente:")) {
+                // Establecer los datos del cliente
+                String clienteNombre = line.split("--")[1].trim();
+                String clienteID = entrada.readLine().split("--")[1].trim();
+                String clienteDireccion = entrada.readLine().split("--")[1].trim();
+                Cliente cliente = new Cliente(clienteID, clienteNombre, clienteDireccion);
+                pedidoActual.setSuCliente(cliente);
+            } else if (line.startsWith("Estado del pedido:")) {
+                // Establecer el estado del pedido
+                char estado = line.split("--")[1].trim().charAt(0);
+                pedidoActual.setEstado(estado);
+            } else if (line.startsWith("Observación del pedido:")) {
+                // Establecer la observación del pedido
+                String observacion = line.split("--")[1].trim();
+                pedidoActual.setObservacion(observacion);
+            } else if (line.startsWith("   -")) {
+                // Agregar detalles de productos al pedido
+                String[] parts = line.split("--");
+                String nombreProducto = parts[0].substring(5).trim();
+                int codigo = Integer.parseInt(parts[1].trim());
+                double cantidad = Double.parseDouble(parts[2].trim());
+                double precio = Double.parseDouble(parts[3].trim());
+
+                if (line.contains("Tipo:")) {
+                    String tipo = parts[4].trim();
+                    ItemProducto producto = new ItemProductoCanastaFamiliar(codigo, nombreProducto, cantidad, precio, tipo);
+                    productos.add(producto);
+                } else if (line.contains("Presentación:")) {
+                    String presentacion = parts[4].trim();
+                    ItemProducto producto = new ItemProductoFarmacia(codigo, nombreProducto, cantidad, precio, presentacion);
+                    productos.add(producto);
+                } else if (line.contains("Iva:")) {
+                    String porcentajeIva = parts[4].trim();
+                    double iva = Double.parseDouble(porcentajeIva.substring(0, porcentajeIva.length() - 1)) / 100.0;
+                    ItemProducto producto = new ItemProductoOtro(codigo, nombreProducto, cantidad, precio, iva);
+                    productos.add(producto);
                 }
             }
-            if (pedidoActual != null) {
-                pedidoActual.setSusItemsProductos(productos);
-                losPedidos.add(pedidoActual);
-            }
-        } catch (IOException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Error al recuperar los pedidos desde el archivo: " + e.getMessage());
         }
+
+        // Agregar el último pedido procesado a la lista de pedidos
+        if (pedidoActual != null) {
+            pedidoActual.setSusItemsProductos(productos);
+            losPedidos.add(pedidoActual);
+        }
+
+        // Cerrando flujo de entrada
+        entrada.close();
+    } catch (IOException | NumberFormatException | DateTimeParseException e) {
+        JOptionPane.showMessageDialog(null, "Error al recuperar los pedidos desde el archivo: " + e.getMessage());
     }
+}
+
 
 
 }
+
 
 
