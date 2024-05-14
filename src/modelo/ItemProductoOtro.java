@@ -1,4 +1,5 @@
-package modelo;
+package Modelo;
+import modelo.ItemProducto;
 
 
 public final class ItemProductoOtro extends ItemProducto {
@@ -6,7 +7,7 @@ public final class ItemProductoOtro extends ItemProducto {
     private double porcentajeIva;
 
     public ItemProductoOtro(int codigo, String nombre, double cantidad, double precio, double porcentajeIva) {
-        super(codigo, nombre, codigo, cantidad);
+        super(codigo, nombre, cantidad, precio);
         this.porcentajeIva = porcentajeIva;
     }
 
