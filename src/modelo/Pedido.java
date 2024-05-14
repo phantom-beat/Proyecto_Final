@@ -3,29 +3,32 @@ package modelo;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 
+
 public class Pedido {
-    private int numeroPedido;
-    private LocalDateTime fechaHora;
-    private Cliente cliente;
-    private char estado;
-    private String observacion;
-    private LinkedList<ItemProducto> productos;
+    int numero;
+    LocalDateTime fechaHora;
+    Cliente suCliente;
+    LinkedList<ItemProducto> susItemsProductos;
+    String observacion;
+    boolean normal;
+    char estado;
 
-    public Pedido(int numeroPedido, LocalDateTime fechaHora, Cliente cliente, LinkedList<ItemProducto> productos, String observacion, boolean par1, char estado) {
-        this.numeroPedido = numeroPedido;
+    public Pedido(int numero, LocalDateTime fechaHora, Cliente suCliente, LinkedList<ItemProducto> susItemsProductos, String observacion, boolean normal, char estado) {
+        this.numero = numero;
         this.fechaHora = fechaHora;
-        this.cliente = cliente;
-        this.estado = estado;
+        this.suCliente = suCliente;
+        this.susItemsProductos = susItemsProductos;
         this.observacion = observacion;
-        this.productos = productos;
+        this.normal = normal;
+        this.estado = estado;
     }
 
-    public int getNumeroPedido() {
-        return numeroPedido;
+    public int getNumero() {
+        return numero;
     }
 
-    public void setNumeroPedido(int numeroPedido) {
-        this.numeroPedido = numeroPedido;
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 
     public LocalDateTime getFechaHora() {
@@ -37,19 +40,19 @@ public class Pedido {
     }
 
     public Cliente getSuCliente() {
-        return cliente;
+        return suCliente;
     }
 
-    public void setSuCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void setSuCliente(Cliente suCliente) {
+        this.suCliente = suCliente;
     }
 
-    public char getEstado() {
-        return estado;
+    public LinkedList<ItemProducto> getSusItemsProductos() {
+        return susItemsProductos;
     }
 
-    public void setEstado(char estado) {
-        this.estado = estado;
+    public void setSusItemsProductos(LinkedList<ItemProducto> susItemsProductos) {
+        this.susItemsProductos = susItemsProductos;
     }
 
     public String getObservacion() {
@@ -60,18 +63,55 @@ public class Pedido {
         this.observacion = observacion;
     }
 
-    public LinkedList<ItemProducto> getSusItemsProductos() {
-        return productos;
+    public boolean isNormal() {
+        return normal;
     }
 
-    public void setSusItemsProductos(LinkedList<ItemProducto> productos) {
-        this.productos = productos;
+    public void setNormal(boolean normal) {
+        this.normal = normal;
+    }
+
+    public char getEstado() {
+        return estado;
+    }
+
+    public void setEstado(char estado) {
+        this.estado = estado;
     }
 
     @Override
     public String toString() {
-        return "Pedido{" + "numeroPedido=" + numeroPedido + ", fechaHora=" + fechaHora + ", cliente=" + cliente + ", estado=" + estado + ", observacion=" + observacion + ", productos=" + productos + '}';
+        return "Pedido{" + "numero=" + numero + ", fechaHora=" + fechaHora + ", suCliente=" + suCliente + ", susItemsProductos=" + susItemsProductos + ", observacion=" + observacion + ", normal=" + normal + ", estado=" + estado + '}';
     }
-    
-    
+public int calcularCantidadItemsPedido() {
+        return susItemsProductos.size(); // Devuelve el número de ítems
+    }
+
+public double calcularValorTotalItems() {
+    double valorTotal = 0.0;
+
+    // Iterar sobre cada ItemProducto en susItemsProductos
+    for (ItemProducto item : susItemsProductos) {
+        int cantidad = (int) item.getCantidad();
+        double precio = item.getPrecio();
+        double porcentajeIva = item.getPorcentajeIva();
+        String categoria = item.getCategoria();
+
+        double valorItem = ItemProducto.calcularValorTotal();
+
+        // Sumar el valor total del ItemProducto al valorTotal
+        valorTotal += valorItem;
+    }
+
+    return valorTotal;
+}
+
+public double calcularValorTotalPagar() {
+    return calcularValorTotalItems();
+}
+
+// Método para calcular el valor total a pagar, sumando un valor por urgencia
+public double calcularValorTotalPagar(double valorUrgencia) {
+    return calcularValorTotalItems() + valorUrgencia; // Suma el valor de los ítems y el valor por urgencia
+}
 }
