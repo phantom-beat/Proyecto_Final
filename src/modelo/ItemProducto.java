@@ -13,6 +13,8 @@ public abstract class ItemProducto {
         this.precio = precio;
     }
 
+    
+
     public int getCodigo() {
         return codigo;
     }
