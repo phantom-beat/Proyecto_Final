@@ -1,38 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 
-/**
- *
- * @author gabag
- */
-public class ItemProducto {
+public abstract class ItemProducto {
     protected int codigo;
-    protected String nombreP;
+    protected String nombre;
     protected double cantidad;
     protected double precio;
 
-    public ItemProducto(int codigo, String nombreP, double cantidad, String presentacion, String tipo, double precio) {
+    public ItemProducto(int codigo, String nombre, double cantidad, double precio) {
         this.codigo = codigo;
-        this.nombreP = nombreP;
+        this.nombre = nombre;
         this.cantidad = cantidad;
         this.precio = precio;
-    }
-public static double calcularValorTotal(int cantidad, double precio, double porcentajeIva, String categoria) {
-    double valorTotal;
-    if (categoria.equals("Farmacia") || categoria.equals("CanastaFamilia")) {
-        valorTotal = cantidad * precio;
-    } else {
-        double precioConIva = precio * (1 + porcentajeIva);
-        valorTotal = cantidad * precioConIva;
-    }
-    return valorTotal;
-}
-
-    public ItemProducto(String codigoProducto, String nombreProducto, int cantidadProducto, double precioProducto) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     public int getCodigo() {
@@ -43,12 +21,12 @@ public static double calcularValorTotal(int cantidad, double precio, double porc
         this.codigo = codigo;
     }
 
-    public String getNombreP() {
-        return nombreP;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNombreP(String nombreP) {
-        this.nombreP = nombreP;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public double getCantidad() {
@@ -67,15 +45,15 @@ public static double calcularValorTotal(int cantidad, double precio, double porc
         this.precio = precio;
     }
 
-
-
-    public String getCategoria() {
-        throw new UnsupportedOperationException("Not supported yet."); 
+    @Override
+    public String toString() {
+        return "ItemProducto{" +
+               "codigo=" + codigo +
+               ", nombre='" + nombre + '\'' +
+               ", cantidad=" + cantidad +
+               ", precio=" + precio +
+               '}';
     }
 
-    public double getPorcentajeIva() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
- 
-    
+    public abstract double calcularValorTotal();
 }
