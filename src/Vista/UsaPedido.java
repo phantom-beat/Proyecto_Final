@@ -22,8 +22,6 @@ import static javax.swing.UIManager.get;
 import modelo.ItemProductoCanastaFamiliar;
 import modelo.ItemProductoFarmacia;
 
-
-    
 public class UsaPedido {
     private static final LinkedList<Pedido> losPedidos = new LinkedList<>();
     private static final String ARCHIVO_PEDIDOS = "pedidos.txt";
@@ -158,27 +156,26 @@ while (agregarMas) {
         cantidadProducto = Double.parseDouble(cantidadProductoStr);
 
         // Si la categoría es Canasta Familiar
-        switch (categoriaItemProducto) {
-            case 'C' -> {
-                tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
-                ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
-                ((ItemProductoCanastaFamiliar) objItemProductoCanastaFamiliar).setTipo(tipoCanastaFamiliar);
-                productos.add(objItemProductoCanastaFamiliar);
-            }
-            case 'F' -> {
-                presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
-                ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
-                ((ItemProductoFarmacia) objItemProductoFarmacia).setPresentacion(presentacionFarmacia);
-                productos.add(objItemProductoFarmacia);
-            }
-            default -> {
-                porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
-                double precio = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
-                ItemProducto objItemProductoOtro = new ItemProductoOtro(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
-                ((ItemProductoOtro) objItemProductoOtro).setPorcentajeIva(porcentajeIva);
-                productos.add(objItemProductoOtro);
-            }
-        }
+       switch (categoriaItemProducto) {
+    case 'C':
+        tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
+        double precioProductoCanastaFamiliar = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+        ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoCanastaFamiliar, tipoCanastaFamiliar);
+        productos.add(objItemProductoCanastaFamiliar);
+        break;
+    case 'F':
+        presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
+        double precioProductoFarmacia = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+        ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoFarmacia, presentacionFarmacia);
+        productos.add(objItemProductoFarmacia);
+        break;
+    default:
+        porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
+        double precioProductoOtro = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+        ItemProducto objItemProductoOtro = new ItemProductoOtro(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProductoOtro, porcentajeIva);
+        productos.add(objItemProductoOtro);
+        break;
+}
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(null, "Entrada inválida. Por favor, ingrese valores numéricos válidos.");
         continue; // Salta a la siguiente iteración del bucle
@@ -188,13 +185,14 @@ while (agregarMas) {
     agregarMas = respuesta == JOptionPane.YES_OPTION;
 }
 
+
 Pedido pedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observacion, true, estado);
 losPedidos.add(pedido);
 guardarPedidoEnArchivo(pedido);
 JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito!");
        }
 }
-private static void guardarPedidoEnArchivo(Pedido pedido) {
+    private static void guardarPedidoEnArchivo(Pedido pedido) {
     try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
         for (Pedido p : losPedidos) {
             out.println("Pedido #" + p.getNumero());
@@ -215,9 +213,9 @@ private static void guardarPedidoEnArchivo(Pedido pedido) {
 
 
 private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) {
-    // Verificar si el estado ingresado es válido (A, D o C)
-    if (estadoPedido != 'A' && estadoPedido != 'D' && estadoPedido != 'C') {
-        JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese A (abierto), D (despachado) o C (cancelado/anulado).");
+    // Verificar si el estado ingresado es válido (C o D)
+    if (estadoPedido != 'C' && estadoPedido != 'D') {
+        JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese C (cancelado/anulado) o D (despachado).");
         return;
     }
 
@@ -230,15 +228,19 @@ private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) 
         }
     }
 
-    if (pedidoEncontrado != null) {
-        // Actualizar el estado del pedido
-        pedidoEncontrado.setEstado(estadoPedido);
-        JOptionPane.showMessageDialog(null, "Estado del pedido #" + numeroPedido + " actualizado correctamente a: " + estadoPedido);
-    } else {
-        JOptionPane.showMessageDialog(null, "Pedido no encontrado con el número: " + numeroPedido);
+    // Si no se encontró el pedido, mostrar un mensaje de error
+    if (pedidoEncontrado == null) {
+        JOptionPane.showMessageDialog(null, "No se encontró el pedido con número " + numeroPedido);
+        return;
     }
-}
 
+    // Actualizar el estado del pedido
+    pedidoEncontrado.setEstado(estadoPedido);
+    JOptionPane.showMessageDialog(null, "El estado del pedido ha sido actualizado.");
+
+    // Guardar los cambios en el archivo de pedidos
+    actualizarArchivoPedido(pedidoEncontrado);
+}
 
     private static void actualizarArchivoPedido(Pedido pedido) {
     // Sobrescribe el archivo completo para actualizar el estado de un pedido específico
@@ -270,8 +272,8 @@ public static void consultarTodosPedidos() {
                         .append("El pedido está normal: ").append(objPedido.isNormal()).append("\n")
                         .append("Estado del pedido: ").append(objPedido.getEstado()).append("\n")
                         .append("Observación del pedido: ").append(objPedido.getObservacion()).append("\n")
-                        .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedido()).append("\n")
-                        .append("Valor total de los items pedidos: ").append(objPedido.calcularValorTotalPagar()).append("\n")
+                        .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedidos()).append("\n")
+                        .append("Valor total de los items pedidos: ").append(objPedido.calcularValorTotalItems()).append("\n")
                         .append("Datos de sus items productos:").append(objPedido.getSusItemsProductos()).append("\n\n");
     }
     
@@ -355,9 +357,8 @@ private static  String consultarPedidoNumero(int numeroPedido) {
         Pedido ultimoPedido = losPedidos.getLast();
 
         // Creamos un string para almacenar la información del pedido
-        String mensaje = """
-                         \u00daltimo Pedido:
-                         Pedido #""" + ultimoPedido.getNumero() + "\n"
+        String mensaje = "Último Pedido:\n"
+                + "Pedido #" + ultimoPedido.getNumero() + "\n"
                 + "Fecha/Hora: " + ultimoPedido.getFechaHora() + "\n"
                 + "Cliente: " + ultimoPedido.getSuCliente().getNombre()
                 + " - ID: " + ultimoPedido.getSuCliente().getIdentificacion()
@@ -528,6 +529,10 @@ private static void generarArchivoTextoDePedidos() {
         JOptionPane.showMessageDialog(null, "Error al escribir el archivo de pedidos: " + e.getMessage());
     }
 }
+//faltan las observaciones 
+
+//ser mas especifico con lasdirecciones 
+    
 
 //malo
 private static void recuperarPedidosDesdeArchivoTexto() {
@@ -578,12 +583,13 @@ private static void recuperarPedidosDesdeArchivoTexto() {
                 String codigoProducto = partes[1].split(":")[1].trim();
                 int cantidadProducto = Integer.parseInt(partes[2].split(":")[1].trim());
                 double precioProducto = Double.parseDouble(partes[3].split(":")[1].trim().substring(1)); // Quitar el símbolo de dólar
-                productos.add(new ItemProducto(codigoProducto, nombreProducto, cantidadProducto, precioProducto) {
+               productos.add(new ItemProducto(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto) {
                     @Override
                     public double calcularValorTotal() {
-                        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                        throw new UnsupportedOperationException(""); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
                     }
-                }); // Añadir el producto
+                }); 
+                   
             }
         }
 
@@ -601,7 +607,6 @@ private static void recuperarPedidosDesdeArchivoTexto() {
     }
 }
 }
-
 
 
 
