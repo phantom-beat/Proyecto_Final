@@ -1,42 +1,31 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelo;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
-import static modelo.ItemProducto.calcularValorTotal;
 
-/**
- *
- * @author gabag
- */
 public class Pedido {
-    int numero;
-    LocalDateTime fechaHora;
-    Cliente suCliente;
-    LinkedList<ItemProducto> susItemsProductos;
-    String observacion;
-    boolean normal;
-    char estado;
+    private int numeroPedido;
+    private LocalDateTime fechaHora;
+    private Cliente cliente;
+    private char estado;
+    private String observacion;
+    private LinkedList<ItemProducto> productos;
 
-    public Pedido(int numero, LocalDateTime fechaHora, Cliente suCliente, LinkedList<ItemProducto> susItemsProductos, String observacion, boolean normal, char estado) {
-        this.numero = numero;
+    public Pedido(int numeroPedido, LocalDateTime fechaHora, Cliente cliente, LinkedList<ItemProducto> productos, String observacion, boolean par1, char estado) {
+        this.numeroPedido = numeroPedido;
         this.fechaHora = fechaHora;
-        this.suCliente = suCliente;
-        this.susItemsProductos = susItemsProductos;
-        this.observacion = observacion;
-        this.normal = normal;
+        this.cliente = cliente;
         this.estado = estado;
+        this.observacion = observacion;
+        this.productos = productos;
     }
 
-    public int getNumero() {
-        return numero;
+    public int getNumeroPedido() {
+        return numeroPedido;
     }
 
-    public void setNumero(int numero) {
-        this.numero = numero;
+    public void setNumeroPedido(int numeroPedido) {
+        this.numeroPedido = numeroPedido;
     }
 
     public LocalDateTime getFechaHora() {
@@ -48,35 +37,11 @@ public class Pedido {
     }
 
     public Cliente getSuCliente() {
-        return suCliente;
+        return cliente;
     }
 
-    public void setSuCliente(Cliente suCliente) {
-        this.suCliente = suCliente;
-    }
-
-    public LinkedList<ItemProducto> getSusItemsProductos() {
-        return susItemsProductos;
-    }
-
-    public void setSusItemsProductos(LinkedList<ItemProducto> susItemsProductos) {
-        this.susItemsProductos = susItemsProductos;
-    }
-
-    public String getObservacion() {
-        return observacion;
-    }
-
-    public void setObservacion(String observacion) {
-        this.observacion = observacion;
-    }
-
-    public boolean isNormal() {
-        return normal;
-    }
-
-    public void setNormal(boolean normal) {
-        this.normal = normal;
+    public void setSuCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     public char getEstado() {
@@ -87,39 +52,26 @@ public class Pedido {
         this.estado = estado;
     }
 
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
+    }
+
+    public LinkedList<ItemProducto> getSusItemsProductos() {
+        return productos;
+    }
+
+    public void setSusItemsProductos(LinkedList<ItemProducto> productos) {
+        this.productos = productos;
+    }
+
     @Override
     public String toString() {
-        return "Pedido{" + "numero=" + numero + ", fechaHora=" + fechaHora + ", suCliente=" + suCliente + ", susItemsProductos=" + susItemsProductos + ", observacion=" + observacion + ", normal=" + normal + ", estado=" + estado + '}';
+        return "Pedido{" + "numeroPedido=" + numeroPedido + ", fechaHora=" + fechaHora + ", cliente=" + cliente + ", estado=" + estado + ", observacion=" + observacion + ", productos=" + productos + '}';
     }
-public int calcularCantidadItemsPedido() {
-        return susItemsProductos.size(); // Devuelve el número de ítems
-    }
-
-public double calcularValorTotalItems() {
-    double valorTotal = 0.0;
-
-    // Iterar sobre cada ItemProducto en susItemsProductos
-    for (ItemProducto item : susItemsProductos) {
-        int cantidad = (int) item.getCantidad();
-        double precio = item.getPrecio();
-        double porcentajeIva = item.getPorcentajeIva();
-        String categoria = item.getCategoria();
-
-        double valorItem = ItemProducto.calcularValorTotal(cantidad, precio, porcentajeIva, categoria);
-
-        // Sumar el valor total del ItemProducto al valorTotal
-        valorTotal += valorItem;
-    }
-
-    return valorTotal;
-}
-
-public double calcularValorTotalPagar() {
-    return calcularValorTotalItems();
-}
-
-// Método para calcular el valor total a pagar, sumando un valor por urgencia
-public double calcularValorTotalPagar(double valorUrgencia) {
-    return calcularValorTotalItems() + valorUrgencia; // Suma el valor de los ítems y el valor por urgencia
-}
+    
+    
 }
