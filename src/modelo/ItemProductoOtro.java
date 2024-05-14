@@ -1,18 +1,14 @@
-
 package modelo;
 
-/**
- *
- * @author gabag
- */
-public class ItemProductoOtro extends ItemProducto {
-    double porcentajeIva;
 
-    public ItemProductoOtro(int codigo, String nombreP, double cantidad, String presentacion, String tipo, double precio) {
-        super(codigo, nombreP, cantidad, presentacion, tipo, precio);
+public final class ItemProductoOtro extends ItemProducto {
+
+    private double porcentajeIva;
+
+    public ItemProductoOtro(int codigo, String nombre, double cantidad, double precio, double porcentajeIva) {
+        super(codigo, nombre, codigo, cantidad);
+        this.porcentajeIva = porcentajeIva;
     }
-
-
 
     public double getPorcentajeIva() {
         return porcentajeIva;
@@ -23,9 +19,9 @@ public class ItemProductoOtro extends ItemProducto {
     }
 
     @Override
-    public String toString() {
-        return "ItemProductoOtro{" + "porcentajeIva=" + porcentajeIva + '}';
+    public double calcularValorTotal() {
+        double precioConIva = this.precio * (1 + this.porcentajeIva);
+        return this.cantidad * precioConIva;
     }
-    
-    
+
 }
