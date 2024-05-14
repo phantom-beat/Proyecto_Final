@@ -102,7 +102,7 @@ public class UsaPedido {
     }
 //se crea el pedido para que el usuario digite los datos correspondientes 
 private static void crearPedido() {
-   try {
+  
        String idCliente = JOptionPane.showInputDialog("Ingrese la identificación del cliente:");
        String nombreCliente = JOptionPane.showInputDialog("Ingrese el nombre del cliente:");
        String direccionCliente = JOptionPane.showInputDialog("Ingrese la dirección del cliente:");
@@ -138,153 +138,108 @@ private static void crearPedido() {
            //pedimos los datos de los productos para crear el objeto en el cual se almacenen los datos 
 
 while (agregarMas) {
-   String codigoProducto = JOptionPane.showInputDialog("Ingrese el código del producto:");
-   String nombreProducto = JOptionPane.showInputDialog("Ingrese el nombre del producto:");
-   String cantidadProductoStr = JOptionPane.showInputDialog("Ingrese la cantidad del producto:");
-   double cantidadProducto;
+    String codigoProducto = JOptionPane.showInputDialog("Ingrese el código del producto:");
+    String nombreProducto = JOptionPane.showInputDialog("Ingrese el nombre del producto:");
+    String cantidadProductoStr = JOptionPane.showInputDialog("Ingrese la cantidad del producto:");
+    double cantidadProducto;
+    char categoriaItemProducto;
+    String tipoCanastaFamiliar = null;
+    String presentacionFarmacia = null;
+    double porcentajeIva = 0;
 
-   char categoriaItemProducto;
-   String tipoCanastaFamiliar;
-   String presentacionFarmacia;
-   double porcentajeIva;
-   
-   ItemProductoCanastaFamiliar objItemProductoCanastaFamiliar;
-   ItemProductoFarmacia objItemPorductoFarmacia;
-   ItemProductoOtro objItemProductoOtro;
-   
+    // Solicitamos al usuario ingresar la categoría del producto hasta que sea válida
+    do {
+        String inputCategoria = JOptionPane.showInputDialog("Ingrese la categoría del producto (C - Canasta Familiar, F - Farmacia, O - Otro): ");
+        categoriaItemProducto = inputCategoria.toUpperCase().charAt(0);
+    } while (categoriaItemProducto != 'C' && categoriaItemProducto != 'F' && categoriaItemProducto != 'O');
 
-   // Solicitamos al usuario ingresar la categoría del producto hasta que sea válida
-   do {
-       String inputCategoria = JOptionPane.showInputDialog("Ingrese la categoría del producto (C - Canasta Familiar, F - Farmacia, O - Otro): ");
-       categoriaItemProducto = inputCategoria.toUpperCase().charAt(0);
-   } while (categoriaItemProducto != 'C' && categoriaItemProducto != 'F' && categoriaItemProducto != 'O');
+    try {
+        cantidadProducto = Double.parseDouble(cantidadProductoStr);
 
-   
-       cantidadProducto = Double.parseDouble(cantidadProductoStr);
+        // Si la categoría es Canasta Familiar
+        switch (categoriaItemProducto) {
+            case 'C':
+                tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
+                ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
+                ((ItemProductoCanastaFamiliar) objItemProductoCanastaFamiliar).setTipo(tipoCanastaFamiliar);
+                productos.add(objItemProductoCanastaFamiliar);
+                break;
+            case 'F':
+                presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
+                ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
+                ((ItemProductoFarmacia) objItemProductoFarmacia).setPresentacion(presentacionFarmacia);
+                productos.add(objItemProductoFarmacia);
+                break;
+            default:
+                porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
+                double precio = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+                ItemProducto objItemProductoOtro = new ItemProductoOtro(nombreProducto, codigoProducto, Integer.parseInt(codigoProducto), cantidadProducto);
+                ((ItemProductoOtro) objItemProductoOtro).setPorcentajeIva(porcentajeIva);
+                productos.add(objItemProductoOtro);
+                break;
+        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Entrada inválida. Por favor, ingrese valores numéricos válidos.");
+        continue; // Salta a la siguiente iteración del bucle
+    }
 
-       // Si la categoría es Canasta Familiar
-       switch (categoriaItemProducto) {
-           case 'C' -> {
-               tipoCanastaFamiliar = JOptionPane.showInputDialog("Ingrese el tipo de canasta familiar (Grano, Carne, Aseo personal, Lácteo, Fruta, Verdura, Legumbre, Papa): ");
-               // Creamos un nuevo objeto ItemProductoCanastaFamiliar y lo agregamos a la lista de productos
-               ItemProducto objItemProductoCanastaFamiliar = new ItemProductoCanastaFamiliar(nombre,  nombreProducto, codigo, cantidad);
-               productos.add(objItemProductoCanastaFamiliar);
-           }
-           case 'F' -> {
-               presentacionFarmacia = JOptionPane.showInputDialog("Ingrese la presentación del producto en Farmacia: ");
-               porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
-               // Creamos un nuevo objeto ItemProductoFarmacia y lo agregamos a la lista de productos
-               ItemProducto objItemProductoFarmacia = new ItemProductoFarmacia(nombre, nombreProducto,codigo, cantidad);
-               productos.add(objItemProductoFarmacia);
-           }
-           default -> {
-               porcentajeIva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto: "));
-               // Creamos un nuevo objeto ItemProductoOtro y lo agregamos a la lista de productos
-               ItemProducto objItemProductoOtro = new ItemProductoOtro(codigoProducto, nombreProducto, cantidadProducto, porcentajeIva);
-               productos.add(objItemProductoOtro);
-           }
-       }
-   } catch (NumberFormatException e) {
-       JOptionPane.showMessageDialog(null, "Entrada inválida. Por favor, ingrese valores numéricos válidos.");
-       continue; // Salta a la siguiente iteración del bucle
-   }
-
-   int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea agregar otro producto?", "Agregar Producto", JOptionPane.YES_NO_OPTION);
-   agregarMas = respuesta == JOptionPane.YES_OPTION;
+    int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea agregar otro producto?", "Agregar Producto", JOptionPane.YES_NO_OPTION);
+    agregarMas = respuesta == JOptionPane.YES_OPTION;
 }
 
 Pedido pedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observacion, true, estado);
 losPedidos.add(pedido);
-
 guardarPedidoEnArchivo(pedido);
-
 JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito!");
 
-private static void guardarPedidoEnArchivo(Pedido pedido) {
+    private static void guardarPedidoEnArchivo(Pedido pedido) {
     try (PrintWriter out = new PrintWriter(new FileWriter(ARCHIVO_PEDIDOS))) {
-        // Intenta abrir el archivo para escritura
-        // Utiliza un bloque try-with-resources para asegurarse de que el recurso se cierre correctamente después
-        // de que se haya terminado de usar
-
         for (Pedido p : losPedidos) {
-            // Escribe cada pedido y sus detalles en el archivo
             out.println("Pedido #" + p.getNumero());
             out.println("Cliente: " + p.getSuCliente().getNombre() + " - ID: " + p.getSuCliente().getIdentificacion() + " - Dirección: " + p.getSuCliente().getDireccion());
             out.println("Estado: " + p.getEstado());
             out.println("Productos:");
-
             for (ItemProducto item : p.getSusItemsProductos()) {
-                // Escribe cada producto del pedido
-                out.println(" - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
+                out.println("   - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
             }
-
             out.println("Observaciones: " + p.getObservacion());
             out.println("--------------------------------------------------");
         }
-
-        // Limpia el flujo de escritura
         out.flush();
     } catch (IOException e) {
-        // Captura cualquier excepción de E/S (entrada/salida) que pueda ocurrir durante la escritura en el archivo
-        // y muestra un mensaje de error al usuario
         JOptionPane.showMessageDialog(null, "Error al guardar los pedidos en el archivo: " + e.getMessage());
     }
 }
 
 
-private static void actualizarEstadoPedido() {
-    try {
-        // Solicita al usuario que ingrese el número del pedido que desea actualizar
-        int numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido que desea actualizar:"));
-
-        // Inicializa la variable pedidoEncontrado como null
-        Pedido pedidoEncontrado = null;
-
-        // Itera sobre la lista de pedidos
-        for (Pedido pedido : losPedidos) {
-            // Compara el número del pedido actual con el número ingresado por el usuario
-            if (pedido.getNumero) == numeroPedido) {
-                // Si coinciden, asigna el pedido actual a la variable pedidoEncontrado
-                pedidoEncontrado = pedido;
-                // Sale del bucle for al encontrar el pedido
-                break;
-            }
-        }
-
-        // Verifica si se encontró un pedido con el número ingresado
-        if (pedidoEncontrado != null) {
-            // Solicita al usuario que ingrese el nuevo estado del pedido
-            String nuevoEstado = JOptionPane.showInputDialog(null,
-                    "Ingrese el nuevo estado del pedido (D: Despachado, C: Cancelado):",
-                    "Actualizar Estado del Pedido",
-                    JOptionPane.QUESTION_MESSAGE);
-
-            // Obtiene el primer carácter del estado ingresado por el usuario
-            char estado = nuevoEstado.charAt(0);
-
-            // Verifica si el estado ingresado es válido (D o C)
-            if (estado == 'D' || estado == 'C') {
-                // Actualiza el estado del pedido
-                pedidoEncontrado.setEstado(estado);
-                // Muestra un mensaje indicando que el estado se ha actualizado
-                JOptionPane.showMessageDialog(null, "El estado del pedido ha sido actualizado.");
-                // Llama al método actualizarArchivoPedido para actualizar el archivo del pedido
-                actualizarArchivoPedido(pedidoEncontrado);
-            } else {
-                // Si el estado ingresado no es válido, muestra un mensaje de error
-                JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese A, D o C.");
-            }
-        } else {
-            // Si no se encontró un pedido con el número ingresado, muestra un mensaje de error
-            JOptionPane.showMessageDialog(null, "No se encontró el pedido con número " + numeroPedido);
-        }
-    } catch (NumberFormatException e) {
-        // Si el usuario ingresa un valor no numérico para el número de pedido, muestra un mensaje de error
-        JOptionPane.showMessageDialog(null, "Número de pedido no válido.");
-    } catch (HeadlessException e) {
-        // Captura una excepción específica relacionada con la interfaz gráfica de usuario
-        JOptionPane.showMessageDialog(null, "Error al actualizar el estado del pedido: " + e.getMessage());
+private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) {
+    // Verificar si el estado ingresado es válido (C o D)
+    if (estadoPedido != 'C' && estadoPedido != 'D') {
+        JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese C (cancelado/anulado) o D (despachado).");
+        return;
     }
+
+    // Buscar el pedido correspondiente en la lista
+    Pedido pedidoEncontrado = null;
+    for (Pedido pedido : losPedidos) {
+        if (pedido.getNumero() == numeroPedido) {
+            pedidoEncontrado = pedido;
+            break;
+        }
+    }
+
+    // Si no se encontró el pedido, mostrar un mensaje de error
+    if (pedidoEncontrado == null) {
+        JOptionPane.showMessageDialog(null, "No se encontró el pedido con número " + numeroPedido);
+        return;
+    }
+
+    // Actualizar el estado del pedido
+    pedidoEncontrado.setEstado(estadoPedido);
+    JOptionPane.showMessageDialog(null, "El estado del pedido ha sido actualizado.");
+
+    // Guardar los cambios en el archivo de pedidos
+    actualizarArchivoPedido(pedidoEncontrado);
 }
 
     private static void actualizarArchivoPedido(Pedido pedido) {
@@ -669,7 +624,12 @@ private static void recuperarPedidosDesdeArchivoTexto() {
                 String codigoProducto = partes[1].split(":")[1].trim();
                 int cantidadProducto = Integer.parseInt(partes[2].split(":")[1].trim());
                 double precioProducto = Double.parseDouble(partes[3].split(":")[1].trim().substring(1)); // Quitar el símbolo de dólar
-                productos.add(new ItemProducto(codigoProducto, nombreProducto, cantidadProducto, precioProducto)); // Añadir el producto
+                productos.add(new ItemProducto(codigoProducto, nombreProducto, cantidadProducto, precioProducto) {
+                    @Override
+                    public double calcularValorTotal() {
+                        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                    }
+                }); // Añadir el producto
             }
         }
 
@@ -687,6 +647,7 @@ private static void recuperarPedidosDesdeArchivoTexto() {
     }
 }
 }
+
 
 
 
