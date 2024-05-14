@@ -1,21 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package modelo;
+package Modelo;
+import modelo.ItemProducto;
 
-/**
- *
- * @author gabag
- */
-public class ItemProductoOtro extends ItemProducto {
-    double porcentajeIva;
 
-    public ItemProductoOtro(int codigo, String nombreP, double cantidad, String presentacion, String tipo, double precio) {
-        super(codigo, nombreP, cantidad, presentacion, tipo, precio);
+public final class ItemProductoOtro extends ItemProducto {
+
+    private double porcentajeIva;
+
+    public ItemProductoOtro(int codigo, String nombre, double cantidad, double precio, double porcentajeIva) {
+        super(codigo, nombre, cantidad, precio);
+        this.porcentajeIva = porcentajeIva;
     }
-
-
 
     public double getPorcentajeIva() {
         return porcentajeIva;
@@ -26,9 +20,10 @@ public class ItemProductoOtro extends ItemProducto {
     }
 
     @Override
-    public String toString() {
-        return "ItemProductoOtro{" + "porcentajeIva=" + porcentajeIva + '}';
+    public double calcularValorTotal() {
+        double precioConIva = this.precio * (1 + this.porcentajeIva);
+        return this.cantidad * precioConIva;
     }
-    
-    
+
 }
+
