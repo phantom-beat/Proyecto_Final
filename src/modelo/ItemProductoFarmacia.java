@@ -4,7 +4,7 @@ public class ItemProductoFarmacia extends ItemProducto {
     private String presentacion;
 
     public ItemProductoFarmacia(int codigo, String nombre, double cantidad, double precio, String presentacion) {
-        super(codigo, nombre, cantidad, precio);
+        super(codigo, nombre, codigo, cantidad);
         this.presentacion = presentacion;
     }
 
@@ -18,7 +18,7 @@ public class ItemProductoFarmacia extends ItemProducto {
 
     @Override
     public double calcularValorTotal() {
-        return cantidad * precio; // Sin IVA
+        return cantidad * precio;
     }
 
     @Override
