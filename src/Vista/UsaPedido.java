@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 
 public class UsaPedido {
     private static final LinkedList<Pedido> losPedidos = new LinkedList<>();
-    private static final String ARCHIVO_PEDIDOS = "pedidos.txt";
+    private static final String ARCHIVO_PEDIDOS = "ARCHIVO_PEDIDOS.txt";
 
     public static void main(String[] args) {
         String[] opciones = {
@@ -292,12 +292,12 @@ private static void actualizarArchivoPedido(Pedido pedido) {
                 sb.append(" - ").append(item.getNombre()).append(", Código: ").append(item.getCodigo())
                   .append(", Cantidad: ").append(item.getCantidad()).append(", Precio: $").append(item.getPrecio()).append("\n");
 
-                if (item instanceof ItemProductoFarmacia farmacia) {
-                    sb.append("   Presentación: ").append(farmacia.getPresentacion()).append("\n");
-                } else if (item instanceof ItemProductoCanastaFamiliar canasta) {
-                    sb.append("   Tipo: ").append(canasta.getTipo()).append("\n");
-                } else if (item instanceof ItemProductoOtro otro) {
-                    sb.append("   Porcentaje IVA: ").append(otro.getPorcentajeIva()).append("%\n");
+                switch (item) {
+                    case ItemProductoFarmacia farmacia -> sb.append("   Presentación: ").append(farmacia.getPresentacion()).append("\n");
+                    case ItemProductoCanastaFamiliar canasta -> sb.append("   Tipo: ").append(canasta.getTipo()).append("\n");
+                    case ItemProductoOtro otro -> sb.append("   Porcentaje IVA: ").append(otro.getPorcentajeIva()).append("%\n");
+                    default -> {
+                    }
                 }
 
                 valorTotalItems += item.getPrecio() * item.getCantidad();
@@ -439,9 +439,9 @@ private static void generarArchivoTextoDePedidos() {
                 out.print("   -" + item.getNombre() + "--" + item.getCodigo() + "--" + item.getCantidad() + "--" + item.getPrecio());
 
                 switch (item) {
-                    case ItemProductoCanastaFamiliar canasta -> out.print("--Tipo:" + canasta.getTipo());
-                    case ItemProductoFarmacia farmacia -> out.print("--Presentación:" + farmacia.getPresentacion());
-                    case ItemProductoOtro otro -> out.print("--Iva:" + String.format("%.2f%%", otro.getPorcentajeIva() * 100));
+                    case ItemProductoCanastaFamiliar canasta -> out.print("--" + canasta.getTipo());
+                    case ItemProductoFarmacia farmacia -> out.print("--" + farmacia.getPresentacion());
+                    case ItemProductoOtro otro -> out.print("--" + String.format("%.2f%%", otro.getPorcentajeIva() * 100));
                     default -> {
                     }
                 }
@@ -471,8 +471,6 @@ private static void recuperarDesdeArchivoTextoDePedidos() {
                 boolean esNormal = datos[5].equals("N");
                 char estado = datos[6].charAt(0);
                 String observacion = datos[7];
-                int cantidadItems = Integer.parseInt(datos[8]);
-                double valorTotalItems = Double.parseDouble(datos[9]);
 
                 Cliente cliente = new Cliente(identificacionCliente, nombreCliente, direccionCliente);
                 LinkedList<ItemProducto> productos = new LinkedList<>();
@@ -521,8 +519,7 @@ private static void recuperarDesdeArchivoTextoDePedidos() {
     }
 }
 
-
-
 }
+
 
 
