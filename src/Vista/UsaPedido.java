@@ -439,15 +439,12 @@ private static void generarArchivoTextoDePedidos() {
             for (ItemProducto item : p.getSusItemsProductos()) {
                 out.print("   -" + item.getNombre() + "--" + item.getCodigo() + "--" + item.getCantidad() + "--" + item.getPrecio());
 
-                if (item instanceof ItemProductoCanastaFamiliar) {
-                    ItemProductoCanastaFamiliar canasta = (ItemProductoCanastaFamiliar) item;
-                    out.print("--Tipo:" + canasta.getTipo());
-                } else if (item instanceof ItemProductoFarmacia) {
-                    ItemProductoFarmacia farmacia = (ItemProductoFarmacia) item;
-                    out.print("--Presentación:" + farmacia.getPresentacion());
-                } else if (item instanceof ItemProductoOtro) {
-                    ItemProductoOtro otro = (ItemProductoOtro) item;
-                    out.print("--Iva:" + String.format("%.2f%%", otro.getPorcentajeIva() * 100));
+                switch (item) {
+                    case ItemProductoCanastaFamiliar canasta -> out.print("--" + canasta.getTipo());
+                    case ItemProductoFarmacia farmacia -> out.print("--" + farmacia.getPresentacion());
+                    case ItemProductoOtro otro -> out.print("--" + String.format("%.2f%%", otro.getPorcentajeIva() * 100));
+                    default -> {
+                    }
                 }
 
                 out.println();
