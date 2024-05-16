@@ -81,79 +81,88 @@ public class UsaPedido {
         }
     }
 
-    private static void crearPedido() {
-        try {
-            String idCliente = JOptionPane.showInputDialog("Ingrese la identificación del cliente:");
-            String nombreCliente = JOptionPane.showInputDialog("Ingrese el nombre del cliente:");
-            String direccionCliente = JOptionPane.showInputDialog("Ingrese la dirección del cliente:");
-            String estadoPedido = JOptionPane.showInputDialog("Ingrese el estado del pedido (A: abierto, D: despachado, C: cancelado):");
-            String observaciones = JOptionPane.showInputDialog("Ingrese las observaciones del pedido:");
+   private static void crearPedido() {
+    try {
+        String idCliente = JOptionPane.showInputDialog("Ingrese la identificación del cliente:");
+        String nombreCliente = JOptionPane.showInputDialog("Ingrese el nombre del cliente:");
+        String direccionCliente = JOptionPane.showInputDialog("Ingrese la dirección del cliente:");
+        String estadoPedido = JOptionPane.showInputDialog("Ingrese el estado del pedido (A: abierto, D: despachado, C: cancelado):");
+        String observaciones = JOptionPane.showInputDialog("Ingrese las observaciones del pedido:");
 
-            LocalDateTime fechaHora = null;
-            boolean formatoValido = false;
-            while (!formatoValido) {
-                try {
-                    String fechaHoraStr = JOptionPane.showInputDialog("Ingrese la fecha y hora (formato: yyyy-MM-dd'T'HH:mm):");
-                    fechaHora = LocalDateTime.parse(fechaHoraStr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
-                    formatoValido = true;
-                } catch (DateTimeParseException e) {
-                    JOptionPane.showMessageDialog(null, "Formato de fecha y hora inválido. Por favor, ingrese en el formato correcto (yyyy-MM-dd'T'HH:mm).");
+        LocalDateTime fechaHora = null;
+        boolean formatoValido = false;
+        while (!formatoValido) {
+            try {
+                String fechaHoraStr = JOptionPane.showInputDialog("Ingrese la fecha y hora (formato: yyyy-MM-dd'T'HH:mm):");
+                fechaHora = LocalDateTime.parse(fechaHoraStr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                formatoValido = true;
+            } catch (DateTimeParseException e) {
+                JOptionPane.showMessageDialog(null, "Formato de fecha y hora inválido. Por favor, ingrese en el formato correcto (yyyy-MM-dd'T'HH:mm).");
+            }
+        }
+
+        char estado = estadoPedido.charAt(0);
+        Cliente cliente = new Cliente(idCliente, nombreCliente, direccionCliente);
+        LinkedList<ItemProducto> productos = new LinkedList<>();
+
+        boolean agregarMas = true;
+        while (agregarMas) {
+            String codigoProducto = JOptionPane.showInputDialog("Ingrese el código del producto:");
+            String nombreProducto = JOptionPane.showInputDialog("Ingrese el nombre del producto:");
+            double cantidadProducto = Double.parseDouble(JOptionPane.showInputDialog("Ingrese la cantidad del producto:"));
+            double precioProducto = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
+            String tipoProducto = JOptionPane.showInputDialog("Ingrese el tipo de producto (Farmacia/Canasta/Otro):");
+
+            ItemProducto producto = null;
+            switch (tipoProducto.toLowerCase()) {
+                case "farmacia" -> {
+                    String presentacion = JOptionPane.showInputDialog("Ingrese la presentación del producto farmacéutico:");
+                    producto = new ItemProductoFarmacia(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto, presentacion);
+                }
+                case "canasta" -> {
+                    String tipo = JOptionPane.showInputDialog("Ingrese el tipo de canasta (Grano, Carne, etc.):");
+                    producto = new ItemProductoCanastaFamiliar(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto, tipo);
+                }
+                case "otro" -> {
+                    double iva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto:"));
+                    producto = new ItemProductoOtro(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto, iva);
                 }
             }
 
-            char estado = estadoPedido.charAt(0);
-            Cliente cliente = new Cliente(idCliente, nombreCliente, direccionCliente);
-            LinkedList<ItemProducto> productos = new LinkedList<>();
-
-            boolean agregarMas = true;
-            while (agregarMas) {
-                String codigoProducto = JOptionPane.showInputDialog("Ingrese el código del producto:");
-                String nombreProducto = JOptionPane.showInputDialog("Ingrese el nombre del producto:");
-                double cantidadProducto = Double.parseDouble(JOptionPane.showInputDialog("Ingrese la cantidad del producto:"));
-                double precioProducto = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio del producto:"));
-                String tipoProducto = JOptionPane.showInputDialog("Ingrese el tipo de producto (Farmacia/Canasta/Otro):");
-
-                ItemProducto producto = null;
-                switch (tipoProducto.toLowerCase()) {
-                    case "farmacia" -> {
-                        String presentacion = JOptionPane.showInputDialog("Ingrese la presentación del producto farmacéutico:");
-                        producto = new ItemProductoFarmacia(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto, presentacion);
-                    }
-                    case "canasta" -> {
-                        String tipo = JOptionPane.showInputDialog("Ingrese el tipo de canasta (Grano, Carne, etc.):");
-                        producto = new ItemProductoCanastaFamiliar(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto, tipo);
-                    }
-                    case "otro" -> {
-                        double iva = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el porcentaje de IVA del producto:"));
-                        producto = new ItemProductoOtro(Integer.parseInt(codigoProducto), nombreProducto, cantidadProducto, precioProducto, iva);
-                    }
-                }
-
-                if (producto != null) {
-                    productos.add(producto);
-                }
-
-                int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea agregar otro producto?", "Agregar Producto", JOptionPane.YES_NO_OPTION);
-                agregarMas = (respuesta == JOptionPane.YES_OPTION);
+            if (producto != null) {
+                productos.add(producto);
             }
 
-                Pedido nuevoPedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observaciones, estado, false);
-                losPedidos.add(nuevoPedido);
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea agregar otro producto?", "Agregar Producto", JOptionPane.YES_NO_OPTION);
+            agregarMas = (respuesta == JOptionPane.YES_OPTION);
+        }
 
-                boolean normal = Boolean.parseBoolean(JOptionPane.showInputDialog("¿El pedido es normal? (true/false):"));
-                double valorTotal;
+        Pedido nuevoPedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observaciones, estado, false);
+        losPedidos.add(nuevoPedido);
 
-                if (normal) {
-                    // Si el pedido es normal, se calcula el valor total sin valor de urgencia
-                    valorTotal = nuevoPedido.calcularValorTotalPagar();
-                    JOptionPane.showMessageDialog(null, "El valor total del pedido normal es: " + valorTotal);
-                } else {
-                    // Si el pedido es urgente, se solicita el valor de urgencia y se calcula el valor total con este
-                    int valorUrgencia = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el valor de urgencia:"));
-                    valorTotal = nuevoPedido.calcularValorTotalPagar(valorUrgencia);
-                    JOptionPane.showMessageDialog(null, "El valor total del pedido urgente es: " + valorTotal);
-                }
+        int respuestaNormal = JOptionPane.showConfirmDialog(null, "¿El pedido es normal?", "Tipo de Pedido", JOptionPane.YES_NO_OPTION);
+        boolean normal = (respuestaNormal == JOptionPane.YES_OPTION);
+        double valorTotal;
 
+        if (normal) {
+            // Si el pedido es normal, se calcula el valor total sin valor de urgencia
+            valorTotal = nuevoPedido.calcularValorTotalPagar();
+            JOptionPane.showMessageDialog(null, "El valor total del pedido normal es: " + valorTotal);
+        } else {
+            // Si el pedido es urgente, se solicita el valor de urgencia y se calcula el valor total con este
+            int valorUrgencia = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el valor de urgencia:"));
+            valorTotal = nuevoPedido.calcularValorTotalPagar(valorUrgencia);
+            JOptionPane.showMessageDialog(null, "El valor total del pedido urgente es: " + valorTotal);
+        }
+
+        guardarPedidoEnArchivo();
+        JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito.");
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Error al ingresar datos numéricos: " + e.getMessage());
+    } catch (HeadlessException e) {
+        JOptionPane.showMessageDialog(null, "Error al crear el pedido: " + e.getMessage());
+    }
+}
             guardarPedidoEnArchivo();
             JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito.");
         } catch (NumberFormatException e) {
