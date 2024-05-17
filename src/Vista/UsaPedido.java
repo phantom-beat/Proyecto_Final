@@ -271,45 +271,53 @@ private static void actualizarArchivoPedido(Pedido pedido) {
 }
 
     private static String consultarPedidoNumero(int numeroPedido) {
-        Pedido pedidoEncontrado = losPedidos.stream()
-            .filter(p -> p.getNumero() == numeroPedido)
-            .findFirst()
-            .orElse(null);
+    Pedido pedidoEncontrado = losPedidos.stream()
+        .filter(p -> p.getNumero() == numeroPedido)
+        .findFirst()
+        .orElse(null);
 
-        if (pedidoEncontrado != null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Pedido #").append(pedidoEncontrado.getNumero()).append("\n");
-            sb.append("Fecha/Hora: ").append(pedidoEncontrado.getFechaHora()).append("\n");
-            sb.append("Cliente: ").append(pedidoEncontrado.getSuCliente().getNombre())
-              .append(" - ID: ").append(pedidoEncontrado.getSuCliente().getIdentificacion())
-              .append(" - Dirección: ").append(pedidoEncontrado.getSuCliente().getDireccion()).append("\n");
-            sb.append("Estado: ").append(pedidoEncontrado.getEstado()).append("\n");
-            sb.append("Observaciones: ").append(pedidoEncontrado.getObservacion()).append("\n");
-            sb.append("Productos:\n");
+    if (pedidoEncontrado != null) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pedido #").append(pedidoEncontrado.getNumero()).append("\n");
+        sb.append("Fecha/Hora: ").append(pedidoEncontrado.getFechaHora()).append("\n");
+        sb.append("Cliente: ").append(pedidoEncontrado.getSuCliente().getNombre())
+          .append(" - ID: ").append(pedidoEncontrado.getSuCliente().getIdentificacion())
+          .append(" - Dirección: ").append(pedidoEncontrado.getSuCliente().getDireccion()).append("\n");
+        sb.append("Estado: ").append(pedidoEncontrado.getEstado()).append("\n");
+        sb.append("Observaciones: ").append(pedidoEncontrado.getObservacion()).append("\n");
+        sb.append("Productos:\n");
 
-            double valorTotalItems = 0;
-            for (ItemProducto item : pedidoEncontrado.getSusItemsProductos()) {
-                sb.append(" - ").append(item.getNombre()).append(", Código: ").append(item.getCodigo())
-                  .append(", Cantidad: ").append(item.getCantidad()).append(", Precio: $").append(item.getPrecio()).append("\n");
+        double valorTotalItems = 0;
+        for (ItemProducto item : pedidoEncontrado.getSusItemsProductos()) {
+            sb.append(" - ").append(item.getNombre()).append(", Código: ").append(item.getCodigo())
+              .append(", Cantidad: ").append(item.getCantidad()).append(", Precio: $").append(item.getPrecio()).append("\n");
 
-                switch (item) {
-                    case ItemProductoFarmacia farmacia -> sb.append("   Presentación: ").append(farmacia.getPresentacion()).append("\n");
-                    case ItemProductoCanastaFamiliar canasta -> sb.append("   Tipo: ").append(canasta.getTipo()).append("\n");
-                    case ItemProductoOtro otro -> sb.append("   Porcentaje IVA: ").append(otro.getPorcentajeIva()).append("%\n");
-                    default -> {
-                    }
+            switch (item) {
+                case ItemProductoFarmacia farmacia -> sb.append("   Presentación: ").append(farmacia.getPresentacion()).append("\n");
+                case ItemProductoCanastaFamiliar canasta -> sb.append("   Tipo: ").append(canasta.getTipo()).append("\n");
+                case ItemProductoOtro otro -> sb.append("   Porcentaje IVA: ").append(otro.getPorcentajeIva()).append("%\n");
+                default -> {
                 }
-
-                valorTotalItems += item.getPrecio() * item.getCantidad();
             }
 
-            sb.append("Cantidad de ítems de pedido: ").append(pedidoEncontrado.getSusItemsProductos().size()).append("\n");
-            sb.append("Valor total de los ítems: $").append(valorTotalItems).append("\n");
-            return sb.toString();
-        } else {
-            return "No se encontró un pedido con el número " + numeroPedido;
+            valorTotalItems += item.getPrecio() * item.getCantidad();
         }
+
+        sb.append("Cantidad de ítems de pedido: ").append(pedidoEncontrado.getSusItemsProductos().size()).append("\n");
+        sb.append("Valor total de los ítems: $").append(valorTotalItems).append("\n");
+
+        JTextArea textArea = new JTextArea(sb.toString());
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(500, 400));
+        JOptionPane.showMessageDialog(null, scrollPane, "Consulta de Pedido por Número", JOptionPane.INFORMATION_MESSAGE);
+
+        return sb.toString();
+    } else {
+        return "No se encontró un pedido con el número " + numeroPedido;
     }
+}
+
 
     private static void consultarUltimoPedido() {
         if (losPedidos.isEmpty()) {
@@ -520,6 +528,7 @@ private static void recuperarDesdeArchivoTextoDePedidos() {
 }
 
 }
+
 
 
 
