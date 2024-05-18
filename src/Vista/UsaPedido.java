@@ -160,11 +160,7 @@ public class UsaPedido {
         JOptionPane.showMessageDialog(null, "Error al crear el pedido: " + e.getMessage());
     }
 }
-            
-
-
-
-
+     
     private static void guardarPedidoEnArchivo() {
         try (PrintWriter out = new PrintWriter(new FileWriter("ARCHIVO_PEDIDOS.txt"))) {
             for (Pedido p : losPedidos) {
@@ -213,33 +209,10 @@ public class UsaPedido {
         if (pedidoEncontrado != null) {
             pedidoEncontrado.setEstado(estadoPedido);
             JOptionPane.showMessageDialog(null, "El estado del pedido #" + numeroPedido + " ha sido actualizado a " + estadoPedido);
-            actualizarArchivoPedido(pedidoEncontrado);
         } else {
             JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
         }
     }
-
-private static void actualizarArchivoPedido(Pedido pedido) {
-    try (PrintWriter out = new PrintWriter(new FileWriter("ARCHIVO_PEDIDOS.txt"))) {
-        for (Pedido p : losPedidos) {
-            out.println("Pedido #" + p.getNumero());
-            out.println("Fecha/Hora: " + p.getFechaHora());
-            out.println("Cliente: " + p.getSuCliente().getNombre() + " - ID: " + p.getSuCliente().getIdentificacion() + " - Dirección: " + p.getSuCliente().getDireccion());
-            out.println("Estado: " + p.getEstado());
-
-            for (ItemProducto item : p.getSusItemsProductos()) {
-                out.println(" - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
-            }
-
-            out.println("Observaciones: " + p.getObservacion());
-            out.println("--------------------------------------------------");
-        }
-
-        out.flush();
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(null, "Error al actualizar el archivo de pedidos: " + e.getMessage());
-    }
-}
 
    public static void consultarTodosPedidos() {
     StringBuilder resultadoBuilder = new StringBuilder("REPORTE DE TODOS LOS PEDIDOS \n\n");
@@ -252,14 +225,12 @@ private static void actualizarArchivoPedido(Pedido pedido) {
             .append("Observación del pedido: ").append(objPedido.getObservacion()).append("\n")
             .append("Cantidad de items del pedido: ").append(objPedido.calcularCantidadItemsPedidos()).append("\n")
             .append("Valor total de los items pedidos: ").append(String.format("%.2f", objPedido.calcularValorTotalItems())).append("\n");
-        
-        // Verificar si el pedido es normal o urgente
+     
         if (objPedido.isNormal()) {
             resultadoBuilder.append("Valor total a pagar (pedido normal): ").append(String.format("%.2f", objPedido.calcularValorTotalPagar())).append("\n");
         } else {
             resultadoBuilder.append("Valor total a pagar (pedido urgente): ").append(String.format("%.2f", objPedido.calcularValorTotalPagar(0))).append("\n");
         }
-        
         resultadoBuilder.append("Datos de sus items productos:").append(objPedido.getSusItemsProductos()).append("\n\n");
     }
 
@@ -317,7 +288,6 @@ private static void actualizarArchivoPedido(Pedido pedido) {
         return "No se encontró un pedido con el número " + numeroPedido;
     }
 }
-
 
     private static void consultarUltimoPedido() {
         if (losPedidos.isEmpty()) {
@@ -528,7 +498,5 @@ private static void recuperarDesdeArchivoTextoDePedidos() {
 }
 
 }
-
-
 
 
