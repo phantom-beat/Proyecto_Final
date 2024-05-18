@@ -97,10 +97,13 @@ public class UsaPedido {
         String observaciones = JOptionPane.showInputDialog("Ingrese las observaciones del pedido:");
 
         LocalDateTime fechaHora = null;
-        while (fechaHora == null) {
+        boolean formatoValido = false;
+
+        while (!formatoValido) {
             try {
                 String fechaHoraStr = JOptionPane.showInputDialog("Ingrese la fecha y hora (formato: yyyy-MM-dd'T'HH:mm):");
                 fechaHora = LocalDateTime.parse(fechaHoraStr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                formatoValido = true;
             } catch (DateTimeParseException e) {
                 JOptionPane.showMessageDialog(null, "Formato de fecha y hora inválido. Por favor, ingrese en el formato correcto (yyyy-MM-dd'T'HH:mm).");
             }
