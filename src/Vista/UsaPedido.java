@@ -293,7 +293,7 @@ public class UsaPedido {
     JOptionPane.showMessageDialog(null, scrollPane, "Todos los Pedidos", JOptionPane.INFORMATION_MESSAGE);
 }
 
-private static String consultarPedidoNumero(int numeroPedido) {
+private static void consultarPedidoNumero(int numeroPedido) {
     Pedido pedidoEncontrado = losPedidos.stream()
         .filter(p -> p.getNumero() == numeroPedido)
         .findFirst()
@@ -334,10 +334,8 @@ private static String consultarPedidoNumero(int numeroPedido) {
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(500, 400));
         JOptionPane.showMessageDialog(null, scrollPane, "Consulta de Pedido por Número", JOptionPane.INFORMATION_MESSAGE);
-
-        return sb.toString();
     } else {
-        return "No se encontró un pedido con el número " + numeroPedido;
+        JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
     }
 }
 
