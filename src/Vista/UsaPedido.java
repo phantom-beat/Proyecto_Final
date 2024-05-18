@@ -47,39 +47,38 @@ public class UsaPedido {
     }
 
     private static void MenuOption(int opcion) {
-        try {
-            switch (opcion) {
-                case 0 -> crearPedido();
-                case 1 -> {
-                    int numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido a actualizar:"));
-                    char estadoPedido = JOptionPane.showInputDialog("Ingrese el nuevo estado del pedido (A, D, C):").charAt(0);
-                    actualizarEstadoPedido(numeroPedido, estadoPedido);
-                }
-                case 2 -> consultarTodosPedidos();
-                case 3 -> {
-                    int numero = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido a consultar:"));
-                    String resultado = consultarPedidoNumero(numero);
-                    JOptionPane.showMessageDialog(null, resultado);
-                }
-                case 4 -> consultarUltimoPedido();
-                case 5 -> eliminarTodosPedidos();
-                case 6 -> {
-                    int numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido que desea eliminar:"));
-                    eliminarUnPedido(numeroPedido);
-                }
-                case 7 -> eliminarUltimoPedido();
-                case 8 -> generarArchivoTextoDePedidos();
-                case 9 -> recuperarDesdeArchivoTextoDePedidos();
-                case 10 -> {
-                    JOptionPane.showMessageDialog(null, "Saliendo del programa.");
-                    System.exit(0);
-                }
-                default -> JOptionPane.showMessageDialog(null, "Opción no válida.");
+    try {
+        switch (opcion) {
+            case 0 -> crearPedido();
+            case 1 -> {
+                int numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido a actualizar:"));
+                char estadoPedido = JOptionPane.showInputDialog("Ingrese el nuevo estado del pedido (A, D, C):").charAt(0);
+                actualizarEstadoPedido(numeroPedido, estadoPedido);
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Por favor, ingrese un valor numérico donde se requiera.");
+            case 2 -> consultarTodosPedidos();
+            case 3 -> {
+                int numero = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido a consultar:"));
+                consultarPedidoNumero(numero);
+            }
+            case 4 -> consultarUltimoPedido();
+            case 5 -> eliminarTodosPedidos();
+            case 6 -> {
+                int numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido que desea eliminar:"));
+                eliminarUnPedido(numeroPedido);
+            }
+            case 7 -> eliminarUltimoPedido();
+            case 8 -> generarArchivoTextoDePedidos();
+            case 9 -> recuperarDesdeArchivoTextoDePedidos();
+            case 10 -> {
+                JOptionPane.showMessageDialog(null, "Saliendo del programa.");
+                System.exit(0);
+            }
+            default -> JOptionPane.showMessageDialog(null, "Opción no válida.");
         }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Por favor, ingrese un valor numérico donde se requiera.");
     }
+}
 
      private static void crearPedido() {
     try {
@@ -201,6 +200,7 @@ public class UsaPedido {
         double valorTotal;
 
         if (normal) {
+
             valorTotal = nuevoPedido.calcularValorTotalPagar();
             JOptionPane.showMessageDialog(null, "El valor total del pedido normal es: " + valorTotal);
         } 
@@ -293,7 +293,7 @@ public class UsaPedido {
     JOptionPane.showMessageDialog(null, scrollPane, "Todos los Pedidos", JOptionPane.INFORMATION_MESSAGE);
 }
 
-private static void consultarPedidoNumero(int numeroPedido) {
+private static String consultarPedidoNumero(int numeroPedido) {
     Pedido pedidoEncontrado = losPedidos.stream()
         .filter(p -> p.getNumero() == numeroPedido)
         .findFirst()
@@ -329,15 +329,21 @@ private static void consultarPedidoNumero(int numeroPedido) {
         sb.append("Cantidad de ítems de pedido: ").append(pedidoEncontrado.getSusItemsProductos().size()).append("\n")
           .append("Valor total de los ítems: $").append(valorTotalItems).append("\n");
 
-        JTextArea textArea = new JTextArea(sb.toString());
+        String resultado = sb.toString();
+        JTextArea textArea = new JTextArea(resultado);
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(500, 400));
         JOptionPane.showMessageDialog(null, scrollPane, "Consulta de Pedido por Número", JOptionPane.INFORMATION_MESSAGE);
+
+        return resultado;
     } else {
-        JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
+        String mensajeError = "No se encontró un pedido con el número " + numeroPedido;
+        JOptionPane.showMessageDialog(null, mensajeError);
+        return mensajeError;
     }
 }
+
 
 private static void consultarUltimoPedido() {
     if (losPedidos.isEmpty()) {
