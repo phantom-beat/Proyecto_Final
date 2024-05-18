@@ -63,7 +63,10 @@ public class UsaPedido {
                 }
                 case 4 -> consultarUltimoPedido();
                 case 5 -> eliminarTodosPedidos();
-                case 6 -> eliminarUnPedido();
+                case 6 -> {
+                    int numeroPedido = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número del pedido que desea eliminar:"));
+                    eliminarUnPedido(numeroPedido);
+                }
                 case 7 -> eliminarUltimoPedido();
                 case 8 -> generarArchivoTextoDePedidos();
                 case 9 -> recuperarDesdeArchivoTextoDePedidos();
@@ -309,37 +312,26 @@ public class UsaPedido {
         }
     }    
 
-    private static void eliminarUnPedido() {
-        String numeroPedidoStr = JOptionPane.showInputDialog("Ingrese el número del pedido que desea eliminar:");
-        if (numeroPedidoStr == null || numeroPedidoStr.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No se ingresó ningún número de pedido.");
-            return;
+    public static void eliminarUnPedido(int numeroPedido) {
+        boolean encontrado = false;
+
+        for (int i = 0; i < losPedidos.size(); i++) {
+            if (losPedidos.get(i).getNumero() == numeroPedido) {
+                int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar el pedido número " + numeroPedido + "?",
+                                                            "Eliminar Pedido", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    losPedidos.remove(i);
+                    JOptionPane.showMessageDialog(null, "El pedido número " + numeroPedido + " ha sido eliminado.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Operación cancelada.");
+                }
+                encontrado = true;
+                break;
+            }
         }
 
-        try {
-            int numeroPedido = Integer.parseInt(numeroPedidoStr);
-            boolean encontrado = false;
-
-            for (int i = 0; i < losPedidos.size(); i++) {
-                if (losPedidos.get(i).getNumero() == numeroPedido) {
-                    int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar el pedido número " + numeroPedido + "?",
-                                                                "Eliminar Pedido", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        losPedidos.remove(i);
-                        JOptionPane.showMessageDialog(null, "El pedido número " + numeroPedido + " ha sido eliminado.");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Operación cancelada.");
-                    }
-                    encontrado = true;
-                    break;
-                }
-            }
-
-            if (!encontrado) {
-                JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Número de pedido no válido. Por favor, ingrese un número entero.");
+        if (!encontrado) {
+            JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
         }
     }
 
