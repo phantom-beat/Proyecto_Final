@@ -151,8 +151,6 @@ public class UsaPedido {
             valorTotal = nuevoPedido.calcularValorTotalPagar(valorUrgencia);
             JOptionPane.showMessageDialog(null, "El valor total del pedido urgente es: " + valorTotal);
         }
-
-        guardarPedidoEnArchivo();
         JOptionPane.showMessageDialog(null, "Pedido creado y guardado con éxito.");
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(null, "Error al ingresar datos numéricos: " + e.getMessage());
@@ -160,37 +158,6 @@ public class UsaPedido {
         JOptionPane.showMessageDialog(null, "Error al crear el pedido: " + e.getMessage());
     }
 }
-     
-    private static void guardarPedidoEnArchivo() {
-        try (PrintWriter out = new PrintWriter(new FileWriter("ARCHIVO_PEDIDOS.txt"))) {
-            for (Pedido p : losPedidos) {
-                out.println("Pedido #" + p.getNumero());
-                out.println("Fecha/Hora: " + p.getFechaHora());
-                out.println("Cliente: " + p.getSuCliente().getIdentificacion() + " - " + p.getSuCliente().getNombre() + " - " + p.getSuCliente().getDireccion());
-                out.println("Estado: " + p.getEstado());
-                out.println("Observaciones: " + p.getObservacion());
-                out.println("Productos:");
-
-                for (ItemProducto item : p.getSusItemsProductos()) {
-                    out.println(" - " + item.getClass().getSimpleName() + " - " + item.getNombre() + ", Código: " + item.getCodigo() + ", Cantidad: " + item.getCantidad() + ", Precio: $" + item.getPrecio());
-
-                    switch (item) {
-                        case ItemProductoFarmacia itemProductoFarmacia -> out.println(" Presentación: " + itemProductoFarmacia.getPresentacion());
-                        case ItemProductoCanastaFamiliar itemProductoCanastaFamiliar -> out.println(" Tipo: " + itemProductoCanastaFamiliar.getTipo());
-                        case ItemProductoOtro itemProductoOtro -> out.println(" IVA: " + itemProductoOtro.getPorcentajeIva() + "%");
-                        default -> {
-                        }
-                    }
-                }
-
-                out.println("--------------------------------------------------");
-            }
-
-            out.flush();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al guardar los pedidos en el archivo: " + e.getMessage());
-        }
-    }
 
     private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) {
         if (estadoPedido != 'A' && estadoPedido != 'D' && estadoPedido != 'C') {
@@ -498,5 +465,3 @@ private static void recuperarDesdeArchivoTextoDePedidos() {
 }
 
 }
-
-
