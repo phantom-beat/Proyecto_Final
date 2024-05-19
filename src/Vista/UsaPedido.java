@@ -80,9 +80,8 @@ public class UsaPedido {
         JOptionPane.showMessageDialog(null, "Por favor, ingrese un valor numérico donde se requiera.");
     }
 }
-
-// Metodo crear pedido
-private static void crearPedido() {
+    // Metodo crear pedido
+     private static void crearPedido() {
     try {
         // Datos del cliente
         String idCliente = JOptionPane.showInputDialog("Ingrese la identificación del cliente:");
@@ -487,9 +486,9 @@ private static void generarArchivoTextoDePedidos() {
         return;
     }
 
-    try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("ARCHIVO_PEDIDOS.txt")))) {
+    try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(ARCHIVO_PEDIDOS)))) {
         for (Pedido p : losPedidos) {
-            out.println(p.getNumero() + "--" + p.getFechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")) +
+            out.print(p.getNumero() + "--" + p.getFechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")) +
                     "--" + p.getSuCliente().getNombre() +
                     "--" + p.getSuCliente().getIdentificacion() +
                     "--" + p.getSuCliente().getDireccion() +
@@ -503,84 +502,98 @@ private static void generarArchivoTextoDePedidos() {
                 out.print("--" + item.getNombre() + "--" + item.getCodigo() + "--" + item.getCantidad() + "--" + item.getPrecio());
 
                 switch (item) {
-                    case ItemProductoCanastaFamiliar canasta -> out.print("--" + canasta.getTipo());
-                    case ItemProductoFarmacia farmacia -> out.print("--" + farmacia.getPresentacion());
-                    case ItemProductoOtro otro -> out.print("--" + String.format("%.2f%%", otro.getPorcentajeIva() * 100));
+                    case ItemProductoCanastaFamiliar itemProductoCanastaFamiliar -> out.print("--" + itemProductoCanastaFamiliar.getTipo());
+                    case ItemProductoFarmacia itemProductoFarmacia -> out.print("--" + itemProductoFarmacia.getPresentacion());
+                    case ItemProductoOtro itemProductoOtro -> out.print("--" + itemProductoOtro.getPorcentajeIva());
                     default -> {
                     }
                 }
 
-                out.println();
+                out.print("\n");
             }
+
+            out.print("\n");  // Separar pedidos
         }
 
         JOptionPane.showMessageDialog(null, "Archivo de pedidos generado con éxito.");
     } catch (IOException e) {
         JOptionPane.showMessageDialog(null, "Error al escribir el archivo de pedidos: " + e.getMessage());
     }
-}// fin metodo generarArchivoDeTexto
+}
+//Fin metodo generarArchivoDetexto
 
 // Metodo recuperarArchivoTextoDePedido
 private static void recuperarDesdeArchivoTextoDePedidos() {
     try (BufferedReader entrada = new BufferedReader(new FileReader(ARCHIVO_PEDIDOS))) {
         String linea;
         while ((linea = entrada.readLine()) != null) {
+            if (linea.trim().isEmpty()) {
+                continue;  // Saltar líneas vacías
+            }
+
             String[] datos = linea.split("--");
-            if (datos.length > 0) {
-                int numeroPedido = Integer.parseInt(datos[0]);
-                LocalDateTime fechaHora = LocalDateTime.parse(datos[1], DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
-                String nombreCliente = datos[2];
-                String identificacionCliente = datos[3];
-                String direccionCliente = datos[4];
-                boolean esNormal = datos[5].equals("N");
-                char estado = datos[6].charAt(0);
-                String observacion = datos[7];
+            if (datos.length > 9) {  // Asegurarse de que hay suficientes datos antes de intentar parsear
+                try {
+                    int numeroPedido = Integer.parseInt(datos[0]);
+                    LocalDateTime fechaHora = LocalDateTime.parse(datos[1], DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                    String nombreCliente = datos[2];
+                    String identificacionCliente = datos[3];
+                    String direccionCliente = datos[4];
+                    boolean esNormal = datos[5].equals("N");
+                    char estado = datos[6].charAt(0);
+                    String observacion = datos[7];
 
-                Cliente cliente = new Cliente(identificacionCliente, nombreCliente, direccionCliente);
-                LinkedList<ItemProducto> productos = new LinkedList<>();
+                    Cliente cliente = new Cliente(identificacionCliente, nombreCliente, direccionCliente);
+                    LinkedList<ItemProducto> productos = new LinkedList<>();
 
-                for (int i = 10; i < datos.length; i++) {
-                    String[] datosItem = datos[i].split("--");
-                    if (datosItem.length > 4) {
-                        String nombreProducto = datosItem[0].substring(4);
-                        int codigoProducto = Integer.parseInt(datosItem[1]);
-                        double cantidadProducto = Double.parseDouble(datosItem[2]);
-                        double precioProducto = Double.parseDouble(datosItem[3]);
-                        String tipoProducto = datosItem[4].substring(5);
+                    for (int i = 10; i < datos.length; i++) {
+                        String[] datosItem = datos[i].split("--");
+                        if (datosItem.length > 4) {
+                            try {
+                                String nombreProducto = datosItem[0];
+                                int codigoProducto = Integer.parseInt(datosItem[1]);
+                                double cantidadProducto = Double.parseDouble(datosItem[2]);
+                                double precioProducto = Double.parseDouble(datosItem[3]);
+                                String tipoProducto = datosItem[4];
 
-                        ItemProducto producto = null;
-                        switch (tipoProducto.toLowerCase()) {
-                            case "tipo:" -> {
-                                String tipo = datosItem[5].substring(5);
-                                producto = new ItemProductoCanastaFamiliar(codigoProducto, nombreProducto, cantidadProducto, precioProducto, tipo);
+                                ItemProducto producto = null;
+                                switch (tipoProducto.toLowerCase()) {
+                                    case "tipo:" -> {
+                                        String tipo = datosItem[5];
+                                        producto = new ItemProductoCanastaFamiliar(codigoProducto, nombreProducto, cantidadProducto, precioProducto, tipo);
+                                    }
+                                    case "presentación:" -> {
+                                        String presentacion = datosItem[5];
+                                        producto = new ItemProductoFarmacia(codigoProducto, nombreProducto, cantidadProducto, precioProducto, presentacion);
+                                    }
+                                    case "iva:" -> {
+                                        double porcentajeIva = Double.parseDouble(datosItem[5]);
+                                        producto = new ItemProductoOtro(codigoProducto, nombreProducto, cantidadProducto, precioProducto, porcentajeIva);
+                                    }
+                                }
+
+                                if (producto != null) {
+                                    productos.add(producto);
+                                }
+                            } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                                JOptionPane.showMessageDialog(null, "Error al parsear los datos del producto: " + e.getMessage());
                             }
-                            case "presentación:" -> {
-                                String presentacion = datosItem[5].substring(14);
-                                producto = new ItemProductoFarmacia(codigoProducto, nombreProducto, cantidadProducto, precioProducto, presentacion);
-                            }
-                            case "iva:" -> {
-                                double porcentajeIva = Double.parseDouble(datosItem[5].substring(4, datosItem[5].length() - 1)) / 100;
-                                producto = new ItemProductoOtro(codigoProducto, nombreProducto, cantidadProducto, precioProducto, porcentajeIva);
-                            }
-                        }
-
-                        if (producto != null) {
-                            productos.add(producto);
                         }
                     }
-                }
 
-                Pedido pedido = new Pedido(numeroPedido, fechaHora, cliente, productos, observacion, estado, esNormal);
-                losPedidos.add(pedido);
+                    Pedido pedido = new Pedido(numeroPedido, fechaHora, cliente, productos, observacion, estado, esNormal);
+                    losPedidos.add(pedido);
+                } catch (NumberFormatException | DateTimeParseException | StringIndexOutOfBoundsException e) {
+                    JOptionPane.showMessageDialog(null, "Error al parsear los datos del pedido: " + e.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Línea mal formateada o incompleta en el archivo: " + linea);
             }
         }
 
         JOptionPane.showMessageDialog(null, "Pedidos recuperados desde el archivo de texto con éxito.");
     } catch (IOException e) {
         JOptionPane.showMessageDialog(null, "Error al recuperar pedidos desde el archivo de texto: " + e.getMessage());
-    } catch (NumberFormatException | DateTimeParseException e) {
-        JOptionPane.showMessageDialog(null, "Error al parsear los datos del archivo de texto: " + e.getMessage());
     }
-}// Fin Metodo recuperarArchivoTextoDePedido
-
+}
 }// fin main class
