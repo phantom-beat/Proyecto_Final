@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+// inicio main class
 public class UsaPedido {
     private static final LinkedList<Pedido> losPedidos = new LinkedList<>();
     private static final String ARCHIVO_PEDIDOS = "ARCHIVO_PEDIDOS.txt";
@@ -28,7 +29,7 @@ public class UsaPedido {
             "Eliminar un Pedido", "Eliminar Último Pedido", "Generar archivo de texto de los pedidos",
             "Recuperar pedidos desde archivo de texto", "Salir"
         };
-
+        // Interfaz del programa 
         int opcion;
         do {
             StringBuilder menuMensaje = new StringBuilder("Seleccione una opción:\n");
@@ -45,7 +46,7 @@ public class UsaPedido {
             }
         } while (true);
     }
-
+    //menu de opciones
     private static void MenuOption(int opcion) {
     try {
         switch (opcion) {
@@ -79,13 +80,14 @@ public class UsaPedido {
         JOptionPane.showMessageDialog(null, "Por favor, ingrese un valor numérico donde se requiera.");
     }
 }
-
+    // MEtodo crear pedido
      private static void crearPedido() {
     try {
+        //datos del cliente
         String idCliente = JOptionPane.showInputDialog("Ingrese la identificación del cliente:");
         String nombreCliente = JOptionPane.showInputDialog("Ingrese el nombre del cliente:");
         String direccionCliente = JOptionPane.showInputDialog("Ingrese la dirección del cliente:");
-        
+        //Estado del pedido
         String estadoPedido = null;
         while (estadoPedido == null || !estadoPedido.matches("[ADC]")) {
             estadoPedido = JOptionPane.showInputDialog("Ingrese el estado del pedido (A: abierto, D: despachado, C: cancelado):");
@@ -108,7 +110,7 @@ public class UsaPedido {
                 JOptionPane.showMessageDialog(null, "Formato de fecha y hora inválido. Por favor, ingrese en el formato correcto (yyyy-MM-dd'T'HH:mm).");
             }
         }
-
+        // Estado y datos del producto
         char estado = estadoPedido.charAt(0);
         Cliente cliente = new Cliente(idCliente, nombreCliente, direccionCliente);
         LinkedList<ItemProducto> productos = new LinkedList<>();
@@ -228,9 +230,9 @@ public class UsaPedido {
     } catch (HeadlessException e) {
         JOptionPane.showMessageDialog(null, "Error al crear el pedido: " + e.getMessage());
     }
-}
+}// fin metodo crear pedido
 
-
+//Metodo ActualizarEstadoPedido
     private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) {
         if (estadoPedido != 'A' && estadoPedido != 'D' && estadoPedido != 'C') {
             JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese A (abierto), D (despachado) o C (cancelado).");
@@ -251,8 +253,9 @@ public class UsaPedido {
         } else {
             JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
         }
-    }
+    }// Fin MEtodo ActualizarEstadoPedido
 
+    // Metodo consultarTodosPedidos
    public static void consultarTodosPedidos() {
     StringBuilder resultadoBuilder = new StringBuilder("REPORTE DE TODOS LOS PEDIDOS \n\n");
     for (Pedido objPedido : losPedidos) {
@@ -294,8 +297,9 @@ public class UsaPedido {
     JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setPreferredSize(new Dimension(500, 400));
     JOptionPane.showMessageDialog(null, scrollPane, "Todos los Pedidos", JOptionPane.INFORMATION_MESSAGE);
-}
+}//Fin metodo consultarTodosPedido
 
+   //Metodo consultarPedidoNumero
 private static String consultarPedidoNumero(int numeroPedido) {
     Pedido pedidoEncontrado = losPedidos.stream()
         .filter(p -> p.getNumero() == numeroPedido)
@@ -345,9 +349,9 @@ private static String consultarPedidoNumero(int numeroPedido) {
         JOptionPane.showMessageDialog(null, mensajeError);
         return mensajeError;
     }
-}
+}// fin metodo consultarPedidoNumero
 
-
+//Metodo consultarUltimoPedido
 private static void consultarUltimoPedido() {
     if (losPedidos.isEmpty()) {
         JOptionPane.showMessageDialog(null, "No hay pedidos para mostrar.");
@@ -391,9 +395,9 @@ private static void consultarUltimoPedido() {
     JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setPreferredSize(new Dimension(500, 300));
     JOptionPane.showMessageDialog(null, scrollPane, "Consulta del Último Pedido", JOptionPane.INFORMATION_MESSAGE);
-}
+}// fin metodo consultarUltimoPedido
 
-
+//metodo EliminarTodosPedidos
     private static void eliminarTodosPedidos() {
         int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar todos los pedidos?",
                                                     "Eliminar Todos los Pedidos", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -403,8 +407,9 @@ private static void consultarUltimoPedido() {
         } else {
             JOptionPane.showMessageDialog(null, "Operación cancelada.");
         }
-    }    
+    }    // fin metodo eliminarTodosPedidos
 
+    // metodo eliminarunPedido
     public static void eliminarUnPedido(int numeroPedido) {
         boolean encontrado = false;
 
@@ -426,8 +431,9 @@ private static void consultarUltimoPedido() {
         if (!encontrado) {
             JOptionPane.showMessageDialog(null, "No se encontró un pedido con el número " + numeroPedido);
         }
-    }
+    }// Fin metodo eliminarUnpedido
 
+    //Metodo eliminarULtimoPedido
     private static void eliminarUltimoPedido() {
         if (losPedidos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay pedidos para eliminar.");
@@ -445,8 +451,9 @@ private static void consultarUltimoPedido() {
         } else {
             JOptionPane.showMessageDialog(null, "Operación cancelada.");
         }
-    }
+    }//Fin metodo EliminarUltimoPedido
 
+    //metodo generarArchivoDetexto
 private static void generarArchivoTextoDePedidos() {
     if (losPedidos.isEmpty()) {
         JOptionPane.showMessageDialog(null, "No hay pedidos para exportar.");
@@ -466,7 +473,7 @@ private static void generarArchivoTextoDePedidos() {
                     "--" + p.calcularValorTotalItems());
 
             for (ItemProducto item : p.getSusItemsProductos()) {
-                out.print("   -" + item.getNombre() + "--" + item.getCodigo() + "--" + item.getCantidad() + "--" + item.getPrecio());
+                out.print("--" + item.getNombre() + "--" + item.getCodigo() + "--" + item.getCantidad() + "--" + item.getPrecio());
 
                 switch (item) {
                     case ItemProductoCanastaFamiliar canasta -> out.print("--" + canasta.getTipo());
@@ -484,9 +491,9 @@ private static void generarArchivoTextoDePedidos() {
     } catch (IOException e) {
         JOptionPane.showMessageDialog(null, "Error al escribir el archivo de pedidos: " + e.getMessage());
     }
-}
+}// fin metodo generarArchivoDeTexto
 
-
+// Metodo recuperarArchivoTextoDePedido
 private static void recuperarDesdeArchivoTextoDePedidos() {
     try (BufferedReader entrada = new BufferedReader(new FileReader(ARCHIVO_PEDIDOS))) {
         String linea;
@@ -547,6 +554,6 @@ private static void recuperarDesdeArchivoTextoDePedidos() {
     } catch (NumberFormatException | DateTimeParseException e) {
         JOptionPane.showMessageDialog(null, "Error al parsear los datos del archivo de texto: " + e.getMessage());
     }
-}
+}// Fin Metodo recuperarArchivoTextoDePedido
 
-}
+}// fin main class
