@@ -185,7 +185,9 @@ public class UsaPedido {
                     producto = new ItemProductoFarmacia(codigoProducto, nombreProducto, cantidadProducto, precioProducto, presentacion);
                 }
                 case "canasta" -> {
-                    String tipo = JOptionPane.showInputDialog("Ingrese el tipo de canasta (Grano, Carne, etc.):");
+                    String tipo = JOptionPane.showInputDialog("""
+                                                              Ingrese el tipo de canasta (Grano, Carne, Aseo hogar, Aseo personal, L\u00e1cteo,
+                                                               Fruta, Verdura, Legumbre, Papa):""");
                     if (tipo == null) return;
                     producto = new ItemProductoCanastaFamiliar(codigoProducto, nombreProducto, cantidadProducto, precioProducto, tipo);
                 }
@@ -228,12 +230,11 @@ public class UsaPedido {
         Pedido nuevoPedido = new Pedido(losPedidos.size() + 1, fechaHora, cliente, productos, observaciones, estado, normal);
 
         if (normal) {
-            nuevoPedido.calcularValorTotalPagar(); // Llamada al método sin valorUrgencia
+            nuevoPedido.calcularValorTotalPagar();
         } else {
-            nuevoPedido.calcularValorTotalPagar(valorUrgencia); // Llamada al método con valorUrgencia
+            nuevoPedido.calcularValorTotalPagar(valorUrgencia);
         }
 
-        // Almacenar el valor de urgencia en la observación
         nuevoPedido.setObservacion(nuevoPedido.getObservacion() + " | Valor de urgencia: " + valorUrgencia);
 
         losPedidos.add(nuevoPedido);
@@ -245,8 +246,6 @@ public class UsaPedido {
         JOptionPane.showMessageDialog(null, "Error al crear el pedido: " + e.getMessage());
     }
 }
-
-
 
     private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) {
         if (estadoPedido != 'A' && estadoPedido != 'D' && estadoPedido != 'C') {
