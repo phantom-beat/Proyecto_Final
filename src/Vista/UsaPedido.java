@@ -46,10 +46,8 @@ public class UsaPedido {
         } while (true);
     }
 
-    /**
-     * Maneja la opción seleccionada en el menú.
-     * @param opcion la opción seleccionada por el usuario.
-     */
+    // Maneja la opción seleccionada en el menú.
+    
     private static void MenuOption(int opcion) {
         try {
             switch (opcion) {
@@ -84,9 +82,7 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Crea un nuevo pedido con los datos proporcionados por el usuario.
-     */
+    // Crea un nuevo pedido con los datos proporcionados por el usuario.
     private static void crearPedido() {
         try {
             String idCliente = JOptionPane.showInputDialog("Ingrese la identificación del cliente:");
@@ -253,11 +249,8 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Actualiza el estado de un pedido.
-     * @param numeroPedido el número del pedido a actualizar.
-     * @param estadoPedido el nuevo estado del pedido.
-     */
+    //Actualiza el estado de un pedido con su respectivo numero.
+     
     private static void actualizarEstadoPedido(int numeroPedido, char estadoPedido) {
         if (estadoPedido != 'A' && estadoPedido != 'D' && estadoPedido != 'C') {
             JOptionPane.showMessageDialog(null, "Estado no válido. Ingrese A (abierto), D (despachado) o C (cancelado).");
@@ -280,9 +273,7 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Consulta y muestra todos los pedidos.
-     */
+    // Metodo Consultar todos los pedidos.
     public static void consultarTodosPedidos() {
         StringBuilder resultadoBuilder = new StringBuilder("REPORTE DE TODOS LOS PEDIDOS \n\n");
         for (Pedido objPedido : losPedidos) {
@@ -339,11 +330,7 @@ public class UsaPedido {
         JOptionPane.showMessageDialog(null, scrollPane, "Todos los Pedidos", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Consulta y muestra un pedido por su número.
-     * @param numeroPedido el número del pedido a consultar.
-     * @return una cadena con la información del pedido.
-     */
+    // Metodo Consultar un pedido por su número.
     private static String consultarPedidoNumero(int numeroPedido) {
         Pedido pedidoEncontrado = losPedidos.stream()
             .filter(p -> p.getNumero() == numeroPedido)
@@ -396,9 +383,7 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Consulta y muestra el último pedido realizado.
-     */
+    // Metodo Consultar el último pedido realizado.
     private static void consultarUltimoPedido() {
         if (losPedidos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay pedidos para mostrar.");
@@ -445,9 +430,7 @@ public class UsaPedido {
         JOptionPane.showMessageDialog(null, scrollPane, "Consulta del Último Pedido", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Elimina todos los pedidos de la lista.
-     */
+    // Metodo Eliminar todos los pedidos de la lista.
     private static void eliminarTodosPedidos() {
         int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar todos los pedidos?",
                                                     "Eliminar Todos los Pedidos", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -459,10 +442,7 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Elimina un pedido específico de la lista.
-     * @param numeroPedido el número del pedido a eliminar.
-     */
+    // Metodo Eliminar un pedido específico de la lista por su numero.
     public static void eliminarUnPedido(int numeroPedido) {
         boolean encontrado = false;
 
@@ -486,9 +466,7 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Elimina el último pedido de la lista.
-     */
+    // Metodo Eliminar el último pedido de la lista.
     private static void eliminarUltimoPedido() {
         if (losPedidos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay pedidos para eliminar.");
@@ -508,9 +486,7 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Genera un archivo de texto con los pedidos actuales.
-     */
+    // Genera un archivo de texto con los pedidos.
     private static void generarArchivoTextoDePedidos() {
         if (losPedidos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay pedidos para exportar.");
@@ -552,9 +528,7 @@ public class UsaPedido {
         }
     }
 
-    /**
-     * Recupera los pedidos desde un archivo de texto.
-     */
+    // Recupera los pedidos desde un archivo de texto.
     private static void recuperarDesdeArchivoTextoDePedidos() {
         try (BufferedReader entrada = new BufferedReader(new FileReader(ARCHIVO_PEDIDOS))) {
             String linea;
@@ -628,5 +602,5 @@ public class UsaPedido {
             JOptionPane.showMessageDialog(null, "Error al recuperar pedidos desde el archivo de texto: " + e.getMessage());
         }
     }
-}
+}// fin main class
 
