@@ -1,5 +1,9 @@
 package Vista;
 
+//John Jainer Riascos.//
+//Gabriel Armando Gil.
+//Jose David Agirre.//
+
 import modelo.*;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
